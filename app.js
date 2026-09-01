@@ -114,9 +114,26 @@ function renderReading(r) {
   $("r-trait").textContent = r.day.trait;
   document.documentElement.style.setProperty("--day-color", r.day.hex);
   document.documentElement.style.setProperty("--day-accent", r.day.accent);
+  renderLuckyItem(r);
   $("r-love").textContent = r.zodiac.love + " " + r.twists[0];
   $("r-work").textContent = r.zodiac.work + " " + r.twists[1];
   $("r-money").textContent = r.zodiac.money + " " + r.twists[2];
+}
+
+// アフィリエイト: 承認後に Involve Asia のディープリンクベースへ差替える
+const AFFILIATE_BASE = null; // 例: "https://invol.co/aff_m?offer_id=...&url="
+function shopeeUrl(q) {
+  const raw = "https://shopee.co.th/search?keyword=" + encodeURIComponent(q);
+  return AFFILIATE_BASE ? AFFILIATE_BASE + encodeURIComponent(raw) : raw;
+}
+
+function renderLuckyItem(r) {
+  const li = LUCKY_ITEMS[r.dayIdx];
+  $("r-item").textContent = li.item + " — " + li.why;
+  $("btn-item").onclick = () => {
+    track("affil_click", li.q);
+    window.open(shopeeUrl(li.q), "_blank", "noopener");
+  };
 }
 
 function revealSecret() {
