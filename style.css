@@ -100,6 +100,20 @@ h1, h2, h3, .btn { font-family: "Prompt", sans-serif; }
 /* wallpaper */
 #wp-canvas { width: 100%; max-width: 250px; display: block; margin: 12px auto; border-radius: 16px; border: 1px solid var(--card-border); }
 
+/* maemor */
+.card-maemor { border-color: #9d4edd66; background: linear-gradient(160deg, #9d4edd1c, #ffffff08); }
+.maemor-intro { font-style: italic; color: #e0aaff; font-size: 0.94rem; }
+.card-maemor textarea {
+  width: 100%; padding: 12px 14px; border-radius: 12px; resize: vertical;
+  border: 1px solid var(--card-border); background: rgba(0, 0, 0, 0.35);
+  color: var(--text); font-size: 1rem; font-family: inherit;
+}
+.card-maemor textarea:focus { outline: 2px solid #9d4edd; border-color: transparent; }
+.maemor-text {
+  white-space: pre-wrap; border-left: 3px solid #9d4edd; padding: 6px 0 6px 16px;
+  margin-top: 16px; font-size: 0.98rem; line-height: 1.95;
+}
+
 /* modal */
 .modal-bg {
   position: fixed; inset: 0; background: rgba(0, 0, 0, 0.6);

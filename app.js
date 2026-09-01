@@ -89,6 +89,8 @@ function init() {
   $("modal-close").addEventListener("click", () => $("modal").classList.add("hidden"));
   $("modal-send").addEventListener("click", onWaitlistSend);
   $("btn-wallpaper").addEventListener("click", onWallpaperDl);
+  $("m-go").addEventListener("click", onMaemorClick);
+  $("m-voice").addEventListener("click", onMaemorVoice);
   track("visit", "ref:" + (document.referrer || "direct"));
 }
 
@@ -147,6 +149,61 @@ function revealSecret() {
     hex: r.day.hex, accent: r.day.accent, name: r.name,
     lucky2: r.lucky2, lucky3: r.lucky3, dayName: r.day.name, seed: r.seed
   });
+}
+
+// ---------- แม่หมอ (美輪明宏式AI鑑定) ----------
+const MAEMOR_API = "https://leo.tail65add4.ts.net/reading";
+
+async function onMaemorClick() {
+  const r = READING; if (!r) return;
+  const btn = $("m-go");
+  const worry = $("m-worry").value.trim();
+  btn.disabled = true;
+  btn.textContent = "แม่หมอกำลังเพ่งดวงของคุณ... 🔮";
+  track("maemor_request", worry ? "with_worry" : "no_worry");
+  try {
+    const res = await fetch(MAEMOR_API, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ name: r.name, dayIdx: r.dayIdx, worry })
+    });
+    const data = await res.json();
+    if (!res.ok) { toast(data.error || "ลองใหม่อีกครั้งนะ"); return; }
+    $("m-out").classList.remove("hidden");
+    typewrite($("m-text"), data.reading);
+    $("m-go").classList.add("hidden");
+    track("maemor_done", "");
+  } catch (e) {
+    toast("แม่หมอขอพักแป๊บนึง ลองใหม่อีกครั้งนะ 🐾");
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "ขอคำทำนายจากแม่หมอ ✨";
+  }
+}
+
+let twTimer;
+function typewrite(el, text) {
+  clearInterval(twTimer);
+  el.textContent = "";
+  let i = 0;
+  twTimer = setInterval(() => {
+    i = Math.min(text.length, i + 3);
+    el.textContent = text.slice(0, i);
+    if (i >= text.length) clearInterval(twTimer);
+  }, 33);
+}
+
+function onMaemorVoice() {
+  const text = $("m-text").textContent;
+  if (!text || !window.speechSynthesis) { toast("อุปกรณ์นี้ไม่รองรับเสียงพูด"); return; }
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = "th-TH";
+  u.rate = 0.95;
+  const th = speechSynthesis.getVoices().find((v) => v.lang && v.lang.startsWith("th"));
+  if (th) u.voice = th;
+  speechSynthesis.speak(u);
+  track("maemor_voice", "");
 }
 
 function onPayClick() {
