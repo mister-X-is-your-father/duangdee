@@ -1,16 +1,14 @@
 #!/usr/bin/env node
-// DuangDee TikTok日次動画ジェネレータ v1
+// DuangDee TikTok日次動画レシピ (動画化エンジンは ~/apps/kamishibai に分離)
 // 使い方: node gen-daily.mjs [YYYY-MM-DD]  (省略時=バンコク時間の今日)
 // 出力: out/YYYY-MM-DD/  daily.mp4 + caption.txt
-// 依存: google-chrome (headless), ffmpeg, ffprobe, edge-tts (CLI)
 
-import { execFileSync } from "node:child_process";
 import { mkdirSync, writeFileSync, rmSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { render } from "../../kamishibai/kamishibai.mjs";
 
 const ROOT = dirname(fileURLToPath(import.meta.url));
-const CHROME = "google-chrome";
 
 // ---------- コンテンツ定義（サイト content.js と整合） ----------
 const DAYS = [
@@ -140,43 +138,21 @@ const slides = [
   }
 ];
 
-// ---------- 生成 ----------
+// ---------- 生成 (kamishibaiに委譲) ----------
 const outDir = join(ROOT, "out", iso);
 rmSync(outDir, { recursive: true, force: true });
 mkdirSync(outDir, { recursive: true });
-const tmp = join(outDir, "tmp");
-mkdirSync(tmp);
-
-const run = (cmd, args) => execFileSync(cmd, args, { stdio: ["ignore", "pipe", "pipe"] });
 
 console.log(`[gen-daily] ${iso} (${thDate}) — 1位:${rank[0].name} 運番:${lucky}`);
-const segs = [];
-slides.forEach((s, i) => {
-  const htmlFile = join(tmp, `s${i}.html`);
-  const png = join(tmp, `s${i}.png`);
-  const mp3 = join(tmp, `s${i}.mp3`);
-  const seg = join(tmp, `seg${i}.mp4`);
-  writeFileSync(htmlFile, s.html);
-  run(CHROME, ["--headless=new", "--disable-gpu", "--no-sandbox", "--hide-scrollbars",
-    "--force-device-scale-factor=1", "--window-size=1080,1920", "--virtual-time-budget=9000",
-    `--screenshot=${png}`, `file://${htmlFile}`]);
-  run("edge-tts", ["--voice", "th-TH-PremwadeeNeural", "--rate=+8%", "--text", s.tts, "--write-media", mp3]);
-  const dur = parseFloat(run("ffprobe", ["-v", "quiet", "-show_entries", "format=duration", "-of", "csv=p=0", mp3]).toString()) + 0.45;
-  run("ffmpeg", ["-y", "-loop", "1", "-i", png, "-i", mp3, "-t", dur.toFixed(2),
-    "-vf", "scale=1080:1920,format=yuv420p", "-r", "30", "-c:v", "libx264", "-preset", "veryfast",
-    "-c:a", "aac", "-ar", "44100", "-b:a", "128k", "-af", "apad", "-shortest", seg]);
-  // -shortestはapadと相性が悪いので長さは-tで制御済み
-  segs.push(seg);
-  console.log(`  slide ${i + 1}/${slides.length} done (${dur.toFixed(1)}s)`);
+const outMp4 = render({
+  out: join(outDir, "daily.mp4"),
+  size: [1080, 1920],
+  voice: "th-TH-PremwadeeNeural",
+  rate: "+8%",
+  slides
 });
-
-const listFile = join(tmp, "list.txt");
-writeFileSync(listFile, segs.map((s) => `file '${s}'`).join("\n"));
-const outMp4 = join(outDir, "daily.mp4");
-run("ffmpeg", ["-y", "-f", "concat", "-safe", "0", "-i", listFile, "-c", "copy", outMp4]);
 
 const caption = `ดวงประจำวันที่ ${thDate} 🔮 เกิดวันไหนปังสุด? เลขนำโชควันนี้ ${lucky} ✨ ดูดวงเจาะลึกของคุณฟรีที่ลิงก์ในไบโอ 🐱
 #ดูดวง #สายมู #ดวงรายวัน #ดวงประจำวัน #เลขนำโชค #มูเตลู #ดูดวงฟรี #fyp`;
 writeFileSync(join(outDir, "caption.txt"), caption);
-rmSync(tmp, { recursive: true, force: true });
 console.log(`[gen-daily] ✅ ${outMp4}`);
