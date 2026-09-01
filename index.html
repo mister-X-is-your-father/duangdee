@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ดวงดี DuangDee — ดูดวงฟรีกับน้องแมวหมอดู 🐱🔮</title>
+  <meta name="description" content="ดูดวงประจำสัปดาห์ฟรี! บอกแค่วันเกิด น้องดวงดีจะเปิดดวงความรัก การงาน การเงิน พร้อมเลขนำโชคและวอลเปเปอร์เสริมดวงเฉพาะคุณ">
+  <meta property="og:title" content="ดวงดี DuangDee — ดูดวงฟรีกับน้องแมวหมอดู">
+  <meta property="og:description" content="บอกแค่วันเกิด รู้ดวงทั้งสัปดาห์ ✨ ความรัก การงาน การเงิน เลขนำโชค และวอลเปเปอร์เสริมดวงของคุณคนเดียว">
+  <meta property="og:type" content="website">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔮</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700&family=Sarabun:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="wrap">
+
+    <!-- hero -->
+    <header class="hero">
+      <svg class="mascot" viewBox="0 0 200 200" role="img" aria-label="น้องดวงดี แมวหมอดู">
+        <!-- หูซ้าย/ขวา -->
+        <polygon points="55,70 68,28 92,62" fill="#5b4636"/>
+        <polygon points="145,70 132,28 108,62" fill="#5b4636"/>
+        <polygon points="62,64 70,40 84,60" fill="#8a6f57"/>
+        <polygon points="138,64 130,40 116,60" fill="#8a6f57"/>
+        <!-- หัว -->
+        <ellipse cx="100" cy="95" rx="52" ry="46" fill="#f3e5cf"/>
+        <!-- แต้มหน้าแบบวิเชียรมาศ -->
+        <ellipse cx="100" cy="112" rx="24" ry="17" fill="#e8d5b8"/>
+        <!-- ตาหลับยิ้ม -->
+        <path d="M72 92 q8 8 16 0" stroke="#5b4636" stroke-width="4" fill="none" stroke-linecap="round"/>
+        <path d="M112 92 q8 8 16 0" stroke="#5b4636" stroke-width="4" fill="none" stroke-linecap="round"/>
+        <!-- จมูก + ปาก -->
+        <path d="M97 106 q3 3 6 0" stroke="#c98b8b" stroke-width="4" fill="none" stroke-linecap="round"/>
+        <path d="M100 109 q0 6 -7 8 M100 109 q0 6 7 8" stroke="#5b4636" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+        <!-- หนวด -->
+        <g stroke="#cbb79b" stroke-width="2.4" stroke-linecap="round">
+          <line x1="42" y1="100" x2="66" y2="103"/><line x1="42" y1="112" x2="66" y2="110"/>
+          <line x1="158" y1="100" x2="134" y2="103"/><line x1="158" y1="112" x2="134" y2="110"/>
+        </g>
+        <!-- ลูกแก้ว -->
+        <circle cx="100" cy="168" r="24" fill="url(#orb)"/>
+        <circle cx="93" cy="161" r="6" fill="rgba(255,255,255,0.75)"/>
+        <defs>
+          <radialGradient id="orb" cx="0.4" cy="0.35" r="1">
+            <stop offset="0%" stop-color="#ffe9a8"/>
+            <stop offset="55%" stop-color="#f4c95d"/>
+            <stop offset="100%" stop-color="#c78f2d"/>
+          </radialGradient>
+        </defs>
+        <!-- อุ้งเท้าจับลูกแก้ว -->
+        <ellipse cx="78" cy="160" rx="10" ry="8" fill="#f3e5cf"/>
+        <ellipse cx="122" cy="160" rx="10" ry="8" fill="#f3e5cf"/>
+        <!-- ประกาย -->
+        <g fill="#f4c95d">
+          <circle cx="38" cy="52" r="3"/><circle cx="166" cy="60" r="2.4"/><circle cx="152" cy="34" r="2"/>
+        </g>
+      </svg>
+      <h1>ดวง<span class="gold">ดี</span></h1>
+      <p class="tagline">น้องดวงดี แมวหมอดูสายมู 🐾 เปิดดวงให้คุณทุกสัปดาห์</p>
+      <span class="badge" id="week-label">ดวงประจำสัปดาห์</span>
+    </header>
+
+    <!-- form -->
+    <section id="screen-form">
+      <div class="card">
+        <h2><span class="emoji">🔮</span>บอกวันเกิด แล้วให้น้องดวงดีเปิดดวงให้เลย</h2>
+        <div class="field">
+          <label for="f-name">ชื่อเล่น (ไม่บังคับ)</label>
+          <input id="f-name" type="text" maxlength="20" placeholder="เช่น มายด์, บอส, ฝ้าย">
+        </div>
+        <div class="field">
+          <label>วัน / เดือน / ปีเกิด (พ.ศ. หรือ ค.ศ. ก็ได้)</label>
+          <div class="row3">
+            <select id="f-day" aria-label="วัน"></select>
+            <select id="f-month" aria-label="เดือน"></select>
+            <input id="f-year" type="number" inputmode="numeric" placeholder="พ.ศ. 2540" aria-label="ปีเกิด">
+          </div>
+        </div>
+        <button class="btn btn-gold" id="f-go">ดูดวงเลย ✨ (ฟรี)</button>
+        <p class="price-note">ไม่ต้องสมัครสมาชิก · วันเกิดของคุณไม่ถูกส่งไปที่เซิร์ฟเวอร์</p>
+      </div>
+    </section>
+
+    <!-- result -->
+    <section id="screen-result" class="hidden">
+      <div class="result-head">
+        <h2 id="r-title"></h2>
+        <p class="sub" id="r-sub"></p>
+        <p class="week-chip" id="r-week"></p>
+      </div>
+
+      <div class="card">
+        <h2><span class="emoji">🌟</span>พลังประจำตัวคุณ</h2>
+        <p id="r-trait"></p>
+      </div>
+      <div class="card">
+        <h2><span class="emoji">💘</span>ความรักสัปดาห์นี้</h2>
+        <p id="r-love"></p>
+      </div>
+      <div class="card">
+        <h2><span class="emoji">💼</span>การงานสัปดาห์นี้</h2>
+        <p id="r-work"></p>
+      </div>
+      <div class="card">
+        <h2><span class="emoji">💰</span>การเงินสัปดาห์นี้</h2>
+        <p id="r-money"></p>
+      </div>
+
+      <!-- locked -->
+      <div class="card">
+        <h2><span class="emoji">👀</span>น้องดวงดีเห็นบางอย่างในดวงคุณ...</h2>
+        <p class="teaser">โชคก้อนใหญ่กำลังเคลื่อนเข้าใกล้คุณในสัปดาห์นี้ — เลขนำโชค วันเวลาทอง และเคล็ดลับเฉพาะตัวของคุณ ซ่อนอยู่ตรงนี้</p>
+
+        <div id="locked-view">
+          <div class="locked-box">
+            <div class="blurred">
+              เลขนำโชคของคุณคือ 4x · x2x<br>
+              วันทองของคุณคือวันxxx ช่วง 1x:00 น.<br>
+              เคล็ดลับ: พกของสีxxxxไว้ใน...
+            </div>
+            <div class="lock-overlay">
+              <span class="lock">🔒</span>
+              <span>ปลดล็อกเพื่อเปิดดวงส่วนลับ</span>
+            </div>
+          </div>
+          <button class="btn btn-gold" id="btn-pay">ปลดล็อกทันที ฿29 <s>฿59</s></button>
+          <button class="btn btn-ghost" id="btn-share">หรือแชร์ให้เพื่อน 1 คน = ปลดล็อกฟรี 💛</button>
+        </div>
+
+        <div id="secret-view" class="hidden">
+          <div class="secret-item">
+            <p class="secret-label">เลขนำโชคของคุณสัปดาห์นี้</p>
+            <p class="secret-num" id="s-lucky"></p>
+          </div>
+          <div class="secret-item">
+            <h2><span class="emoji">⏰</span>วันและเวลาทอง</h2>
+            <p id="s-golden"></p>
+          </div>
+          <div class="secret-item">
+            <h2><span class="emoji">🤫</span>เคล็ดลับเสริมดวงเฉพาะคุณ</h2>
+            <p id="s-tip"></p>
+          </div>
+          <div class="secret-item">
+            <h2><span class="emoji">📱</span>วอลเปเปอร์เสริมดวงของคุณ</h2>
+            <canvas id="wp-canvas"></canvas>
+            <button class="btn btn-day" id="btn-wallpaper">ดาวน์โหลดวอลเปเปอร์ ⬇️</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- modal -->
+    <div id="modal" class="modal-bg hidden">
+      <div class="modal-card">
+        <button class="modal-close" id="modal-close" aria-label="ปิด">×</button>
+        <h3>🎉 ระบบชำระเงินกำลังเปิดเร็ว ๆ นี้!</h3>
+        <p>ฝากอีเมลหรือ LINE ID ไว้ แล้วรับ<b>ส่วนลด 50%</b> ทันทีที่เปิดตัว — แถมรอบนี้น้องดวงดีปลดล็อกให้ฟรีเลย 🐱</p>
+        <div class="field">
+          <input id="modal-contact" type="text" placeholder="อีเมล หรือ LINE ID">
+        </div>
+        <button class="btn btn-gold" id="modal-send">รับส่วนลด + ปลดล็อกฟรี</button>
+      </div>
+    </div>
+
+    <div id="toast" class="hidden"></div>
+
+    <footer>
+      🐱 ดวงดี DuangDee · รุ่นทดลอง (Beta)<br>
+      เพื่อความบันเทิงเท่านั้น · ไม่การันตีผลลัพธ์ใด ๆ · โปรดใช้วิจารณญาณ<br>
+      วันเกิดของคุณถูกประมวลผลบนอุปกรณ์ของคุณเท่านั้น เราเก็บเฉพาะสถิติการใช้งานแบบไม่ระบุตัวตน
+    </footer>
+  </div>
+
+  <script src="content.js"></script>
+  <script src="wallpaper.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
