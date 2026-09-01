@@ -152,7 +152,7 @@ function revealSecret() {
 }
 
 // ---------- แม่หมอ (美輪明宏式AI鑑定) ----------
-const MAEMOR_API = "https://leo.tail65add4.ts.net/reading";
+const MAEMOR_API = "https://leo.tail65add4.ts.net:10000/reading";
 
 async function onMaemorClick() {
   const r = READING; if (!r) return;
