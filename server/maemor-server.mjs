@@ -8,6 +8,7 @@ const KEY = process.env.ANTHROPIC_API_KEY;
 if (!KEY) { console.error("ANTHROPIC_API_KEY missing"); process.exit(1); }
 
 const ALLOWED_ORIGINS = [
+  "https://duangdee.me", "https://www.duangdee.me",
   "https://mister-x-is-your-father.github.io",
   "http://127.0.0.1:8944", "http://localhost:8944", "http://leo:8944"
 ];
