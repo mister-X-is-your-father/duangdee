@@ -91,7 +91,8 @@ function init() {
   $("btn-wallpaper").addEventListener("click", onWallpaperDl);
   $("m-go").addEventListener("click", onMaemorClick);
   $("m-voice").addEventListener("click", onMaemorVoice);
-  track("visit", "ref:" + (document.referrer || "direct"));
+  const src = new URLSearchParams(location.search).get("s") || "";
+  track("visit", (src ? "src:" + src + " " : "") + "ref:" + (document.referrer || "direct"));
 }
 
 function onSubmit() {
@@ -224,7 +225,7 @@ async function onShareClick() {
   const data = {
     title: "ดวงดี DuangDee",
     text: "ลองดูดวงฟรีกับน้องดวงดี 🐱🔮 บอกแค่วันเกิดก็รู้ดวงทั้งสัปดาห์!",
-    url: location.origin + location.pathname
+    url: location.origin + location.pathname + "?s=sh"
   };
   try {
     if (navigator.share) { await navigator.share(data); track("share_unlock", "webshare"); }
