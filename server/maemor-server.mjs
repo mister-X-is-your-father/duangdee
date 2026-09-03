@@ -1,14 +1,19 @@
 #!/usr/bin/env node
-// แม่หมอดวงดี API — 美輪明宏式AI鑑定 (Claude Haiku)
+// แม่หมอดีดี API — 美輪明宏式AI鑑定
 // 127.0.0.1:8977 で待受け、Tailscale Funnel経由で公開される
+// エンジン: ①ANTHROPIC_API_KEY があれば API(Haiku) を優先
+//          ②キー無し/失敗時は leo の `claude` CLI (Maxプラン認証) にフォールバック = テスト用
 import { createServer } from "node:http";
+import { execFile } from "node:child_process";
 
 const PORT = 8977;
-const KEY = process.env.ANTHROPIC_API_KEY;
-if (!KEY) { console.error("ANTHROPIC_API_KEY missing"); process.exit(1); }
+const KEY = process.env.ANTHROPIC_API_KEY && /^sk-ant-/.test(process.env.ANTHROPIC_API_KEY)
+  ? process.env.ANTHROPIC_API_KEY : null;
+const MODEL = "claude-haiku-4-5-20251001";
+const CLAUDE_BIN = "/home/neo/.local/bin/claude";  // Maxプラン認証のClaude Code CLI
 
 const ALLOWED_ORIGINS = [
-  "https://deedee.me", "https://www.deedee.me",
+  "https://duangdeedee.me", "https://www.duangdeedee.me",
   "https://mister-x-is-your-father.github.io",
   "http://127.0.0.1:8944", "http://localhost:8944", "http://leo:8944"
 ];
@@ -60,24 +65,45 @@ async function reading(body) {
 เรื่องที่กังวล (หมวด): ${topic || "ไม่ระบุ"}
 คำบอกเล่าจากใจ: ${worry || "(เขาไม่ได้พิมพ์อะไร — อ่านใจจากวันเกิด)"}`;
 
+  // ① API優先（キーがある場合）
+  if (KEY) {
+    try {
+      const text = await apiReading(user);
+      if (text) return { text, engine: "api" };
+    } catch (e) {
+      console.error("[maemor] API失敗→CLIへフォールバック:", e.message);
+    }
+  }
+  // ② フォールバック: leoの claude CLI (Maxプラン, テスト用)
+  const text = await cliReading(user);
+  return { text, engine: "cli" };
+}
+
+async function apiReading(user) {
   const res = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
-    headers: {
-      "x-api-key": KEY,
-      "anthropic-version": "2023-06-01",
-      "content-type": "application/json"
-    },
-    body: JSON.stringify({
-      model: "claude-haiku-4-5-20251001",
-      max_tokens: 800,
-      temperature: 0.9,
-      system: SYSTEM,
-      messages: [{ role: "user", content: user }]
-    })
+    headers: { "x-api-key": KEY, "anthropic-version": "2023-06-01", "content-type": "application/json" },
+    body: JSON.stringify({ model: MODEL, max_tokens: 800, temperature: 0.9, system: SYSTEM,
+      messages: [{ role: "user", content: user }] })
   });
   if (!res.ok) throw new Error("upstream " + res.status + " " + (await res.text()).slice(0, 200));
   const data = await res.json();
   return data.content?.[0]?.text || "";
+}
+
+// テスト用フォールバック: Claude Code CLI(Maxプラン認証)をprintモードで叩く
+function cliReading(user) {
+  return new Promise((resolve, reject) => {
+    execFile(CLAUDE_BIN,
+      ["-p", user, "--system-prompt", SYSTEM, "--model", MODEL, "--output-format", "text"],
+      { env: { ...process.env, HOME: "/home/neo" }, timeout: 90000, maxBuffer: 1 << 20 },
+      (err, stdout, stderr) => {
+        if (err) return reject(new Error("cli " + err.message + " " + String(stderr).slice(0, 150)));
+        const t = String(stdout).trim();
+        if (!t) return reject(new Error("cli empty output"));
+        resolve(t);
+      });
+  });
 }
 
 createServer(async (req, res) => {
@@ -100,14 +126,14 @@ createServer(async (req, res) => {
   req.on("data", (c) => { raw += c; if (raw.length > 4096) req.destroy(); });
   req.on("end", async () => {
     try {
-      const text = await reading(JSON.parse(raw || "{}"));
+      const { text, engine } = await reading(JSON.parse(raw || "{}"));
       res.writeHead(200, { "content-type": "application/json; charset=utf-8" });
       res.end(JSON.stringify({ reading: text }));
-      console.log(`[maemor] ok ip=${ip} global=${global_}/${LIMIT_GLOBAL}`);
+      console.log(`[maemor] ok engine=${engine} ip=${ip} global=${global_}/${LIMIT_GLOBAL}`);
     } catch (e) {
       console.error("[maemor] error:", e.message);
       res.writeHead(500, { "content-type": "application/json" });
       res.end(JSON.stringify({ error: "แม่หมอขอพักแป๊บนึง ลองใหม่อีกครั้งนะ" }));
     }
   });
-}).listen(PORT, "127.0.0.1", () => console.log(`[maemor] listening on 127.0.0.1:${PORT}`));
+}).listen(PORT, "127.0.0.1", () => console.log(`[maemor] listening on 127.0.0.1:${PORT} — engine=${KEY ? "api(+cli fallback)" : "cli(Maxプラン, テスト用)"}`));
