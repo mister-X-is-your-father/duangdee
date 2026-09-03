@@ -9,7 +9,7 @@ import { spawn } from "node:child_process";
 const PORT = 8977;
 const KEY = process.env.ANTHROPIC_API_KEY && /^sk-ant-/.test(process.env.ANTHROPIC_API_KEY)
   ? process.env.ANTHROPIC_API_KEY : null;
-const MODEL = "claude-haiku-4-5-20251001";
+const MODEL = "claude-sonnet-5";  // 感動鑑定の核=文章力優先(Haikuから格上げ)。無料占いはクライアント側静的なので影響なし
 const CLAUDE_BIN = "/home/neo/.local/bin/claude";  // Maxプラン認証のClaude Code CLI
 
 const ALLOWED_ORIGINS = [
