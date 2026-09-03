@@ -29,18 +29,14 @@ function cyrb53(str, seed = 0) {
   return 4294967296 * (2097151 & h2) + (h1 >>> 0);
 }
 
-function currentWeek() {
-  const now = new Date();
-  const jan1 = new Date(now.getFullYear(), 0, 1);
-  return now.getFullYear() * 100 + Math.ceil((((now - jan1) / 86400000) + jan1.getDay() + 1) / 7);
+function todayKey() {
+  const n = new Date();
+  return n.getFullYear() + "-" + (n.getMonth() + 1) + "-" + n.getDate();
 }
 
-function weekRangeLabel() {
-  const now = new Date();
-  const mon = new Date(now); mon.setDate(now.getDate() - ((now.getDay() + 6) % 7));
-  const sun = new Date(mon); sun.setDate(mon.getDate() + 6);
-  const f = (d) => d.getDate() + " " + THAI_MONTHS_ABBR[d.getMonth()];
-  return f(mon) + " – " + f(sun);
+function todayLabel() {
+  const n = new Date();
+  return n.getDate() + " " + THAI_MONTHS_ABBR[n.getMonth()];
 }
 
 function computeReading(name, d, m, yearInput) {
@@ -50,8 +46,7 @@ function computeReading(name, d, m, yearInput) {
   if (date.getFullYear() !== ce || date.getMonth() !== m - 1 || date.getDate() !== d) return null;
   if (ce < 1900 || ce > new Date().getFullYear()) return null;
 
-  const week = currentWeek();
-  const seed = cyrb53(d + "-" + m + "-" + ce + "-w" + week);
+  const seed = cyrb53(d + "-" + m + "-" + ce + "-d" + todayKey());  // 日替わり
   const dayIdx = date.getDay();
   const zIdx = (((ce - 4) % 12) + 12) % 12;
   const day = DAYS[dayIdx];
@@ -60,12 +55,11 @@ function computeReading(name, d, m, yearInput) {
     .replaceAll("{color}", day.color).replaceAll("{day}", day.name);
 
   return {
-    name: name.trim(), ce, dayIdx, zIdx, week, seed,
+    name: name.trim(), ce, dayIdx, zIdx, seed,
     day, zodiac: ZODIAC[zIdx],
     twists: [TWISTS[seed % TWISTS.length], TWISTS[(seed >>> 3) % TWISTS.length], TWISTS[(seed >>> 5) % TWISTS.length]],
     lucky2: String(seed % 100).padStart(2, "0"),
     lucky3: String(Math.floor(seed / 100) % 1000).padStart(3, "0"),
-    goldenDay: WEEKDAY_NAMES[(seed >>> 9) % 7],
     goldenSlot: GOLDEN_SLOTS[(seed >>> 11) % GOLDEN_SLOTS.length],
     tip
   };
@@ -74,7 +68,7 @@ function computeReading(name, d, m, yearInput) {
 // ---------- UI ----------
 let READING = null;
 const $ = (id) => document.getElementById(id);
-const unlockKey = () => "dd_unlock_" + currentWeek();
+const unlockKey = () => "dd_unlock_" + todayKey();
 const isUnlocked = () => { try { return localStorage.getItem(unlockKey()) === "1"; } catch (e) { return false; } };
 function setUnlocked() { try { localStorage.setItem(unlockKey(), "1"); } catch (e) { } }
 
@@ -82,7 +76,7 @@ function init() {
   const daySel = $("f-day"), monSel = $("f-month");
   for (let i = 1; i <= 31; i++) daySel.add(new Option(i, i));
   THAI_MONTHS.forEach((mn, i) => monSel.add(new Option(mn, i + 1)));
-  $("week-label").textContent = "ดวงประจำสัปดาห์ " + weekRangeLabel();
+  $("week-label").textContent = "ดวงวันนี้ · " + todayLabel();
   $("f-go").addEventListener("click", onSubmit);
   $("btn-pay").addEventListener("click", onPayClick);
   $("btn-share").addEventListener("click", onShareClick);
@@ -113,7 +107,7 @@ function onSubmit() {
 function renderReading(r) {
   $("r-title").textContent = (r.name ? "คุณ" + r.name : "คุณ") + " · " + r.zodiac.emoji + " " + r.zodiac.name;
   $("r-sub").textContent = "เกิด" + r.day.name + " " + r.day.color + " · " + r.day.power;
-  $("r-week").textContent = "ดวงประจำสัปดาห์ " + weekRangeLabel();
+  $("r-week").textContent = "ดวงวันนี้ · " + todayLabel();
   $("r-trait").textContent = r.day.trait;
   document.documentElement.style.setProperty("--day-color", r.day.hex);
   document.documentElement.style.setProperty("--day-accent", r.day.accent);
@@ -144,7 +138,7 @@ function revealSecret() {
   $("locked-view").classList.add("hidden");
   $("secret-view").classList.remove("hidden");
   $("s-lucky").textContent = r.lucky2 + " · " + r.lucky3;
-  $("s-golden").textContent = r.goldenDay + " " + r.goldenSlot;
+  $("s-golden").textContent = r.goldenSlot;
   $("s-tip").textContent = r.tip;
   drawWallpaper($("wp-canvas"), {
     hex: r.day.hex, accent: r.day.accent, name: r.name,
