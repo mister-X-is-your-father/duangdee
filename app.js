@@ -58,8 +58,9 @@ function computeReading(name, d, m, yearInput) {
     name: name.trim(), ce, dayIdx, zIdx, seed,
     day, zodiac: ZODIAC[zIdx],
     twists: [TWISTS[seed % TWISTS.length], TWISTS[(seed >>> 3) % TWISTS.length], TWISTS[(seed >>> 5) % TWISTS.length]],
-    lucky2: String(seed % 100).padStart(2, "0"),
-    lucky3: String(Math.floor(seed / 100) % 1000).padStart(3, "0"),
+    lucky2: String(seed % 100).padStart(2, "0"),        // อันดับ1 (ロック=クライマックス)
+    lucky3: String(Math.floor(seed / 100) % 1000).padStart(3, "0"), // อันดับ2 (3桁, 表示)
+    lucky2b: String((seed >>> 9) % 100).padStart(2, "0"),          // อันดับ3 (2桁, 表示)
     goldenSlot: GOLDEN_SLOTS[(seed >>> 11) % GOLDEN_SLOTS.length],
     tip
   };
@@ -116,6 +117,12 @@ function renderReading(r) {
   $("r-love").textContent = r.zodiac.love + " " + r.twists[0];
   $("r-work").textContent = r.zodiac.work + " " + r.twists[1];
   $("r-money").textContent = r.zodiac.money + " " + r.twists[2];
+  // 無料で見せる部分（引きを作る）: ゴールデンタイム・Tips・ランキング2/3位
+  $("s-golden").textContent = r.goldenSlot;
+  $("s-tip").textContent = r.tip;
+  $("rk2").textContent = r.lucky3;
+  $("rk3").textContent = r.lucky2b;
+  $("rk1").textContent = r.lucky2;  // 実数字をブラーで見せる=「見えそうで見えない」引き
 }
 
 // สีมงคล/เรียกเงิน/กาลกิณี ประจำวันเกิด + ข้อความแบบ "แม่หมอพูดกับคุณคนเดียว"
@@ -155,11 +162,15 @@ function renderLuckyItem(r) {
 
 function revealSecret() {
   const r = READING; if (!r) return;
-  $("locked-view").classList.add("hidden");
-  $("secret-view").classList.remove("hidden");
-  $("s-lucky").textContent = r.lucky2 + " · " + r.lucky3;
-  $("s-golden").textContent = r.goldenSlot;
-  $("s-tip").textContent = r.tip;
+  // クライマックス（อันดับ1）だけ解禁 + 壁紙（報酬）
+  $("rk1").textContent = r.lucky2;
+  $("rk1").classList.remove("rk1-blur");
+  $("rk1-tag").classList.add("hidden");
+  $("rk1-lead").classList.add("hidden");
+  $("lock-cta").classList.add("hidden");
+  $("wp-locked").classList.add("hidden");
+  $("wp-canvas").classList.remove("hidden");
+  $("btn-wallpaper").classList.remove("hidden");
   drawWallpaper($("wp-canvas"), {
     hex: r.day.hex, accent: r.day.accent, name: r.name,
     lucky2: r.lucky2, lucky3: r.lucky3, dayName: r.day.name, seed: r.seed,

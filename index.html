@@ -157,42 +157,40 @@
 
       <div class="card">
         <h2><span class="emoji">👀</span>แม่หมอดีดีเห็นบางอย่างในดวงคุณ...</h2>
-        <p class="teaser">มีบางอย่างในดวงคุณวันนี้ ที่แม่อยากบอกคุณตรง ๆ — เลขนำโชค ช่วงเวลาดี และเคล็ดลับเฉพาะคุณ แม่เก็บไว้ให้แล้ว</p>
+        <p class="teaser">ดวงคุณสัปดาห์นี้ แม่อ่านให้เกือบครบแล้ว — เหลือ<b>เลขอันดับ 1</b> ที่แม่กระซิบเฉพาะคุณคนเดียว 👇</p>
 
-        <div id="locked-view">
-          <div class="locked-box">
-            <div class="blurred">
-              เลขนำโชคของคุณคือ 4x · x2x<br>
-              วันทองของคุณคือวันxxx ช่วง 1x:00 น.<br>
-              เคล็ดลับ: พกของสีxxxxไว้ใน...
-            </div>
-            <div class="lock-overlay">
-              <span class="lock">🔒</span>
-              <span>แม่เก็บไว้ให้เฉพาะคุณ</span>
-            </div>
-          </div>
-          <button class="btn btn-gold" id="btn-pay">ปลดล็อกทันที ฿29 <s>฿59</s></button>
-          <button class="btn btn-ghost" id="btn-share">หรือแชร์ให้เพื่อน 1 คน = ปลดล็อกฟรี 💛</button>
+        <div class="secret-item">
+          <h2><span class="emoji">⏰</span>ช่วงเวลาดีวันนี้</h2>
+          <p id="s-golden"></p>
+        </div>
+        <div class="secret-item">
+          <h2><span class="emoji">🤫</span>เคล็ดลับเสริมดวงเฉพาะคุณ</h2>
+          <p id="s-tip"></p>
         </div>
 
-        <div id="secret-view" class="hidden">
-          <div class="secret-item">
-            <p class="secret-label">เลขนำโชคของคุณวันนี้</p>
-            <p class="secret-num" id="s-lucky"></p>
+        <div class="secret-item">
+          <h2><span class="emoji">🔢</span>เลขนำโชคของคุณสัปดาห์นี้</h2>
+          <ol class="lucky-rank">
+            <li class="rank-row"><span class="rank-badge b3">3</span><span class="rank-num" id="rk3"></span></li>
+            <li class="rank-row"><span class="rank-badge b2">2</span><span class="rank-num" id="rk2"></span></li>
+            <li class="rank-row rank-top">
+              <span class="rank-badge b1">1</span>
+              <span class="rank-num rk1-blur" id="rk1"></span>
+              <span class="rk1-tag" id="rk1-tag">🔒</span>
+            </li>
+          </ol>
+          <p class="rank-lead" id="rk1-lead">อันดับ 1 คือเลขที่แม่หมอเห็น<b>ชัดที่สุด</b>ในดวงคุณสัปดาห์นี้… มันอยู่ตรงหน้าคุณแล้ว แค่ยังอ่านไม่ออก 🐾</p>
+          <div id="lock-cta">
+            <button class="btn btn-gold" id="btn-pay">ขอแม่หมอเปิดเลขอันดับ 1 · ฿29 <s>฿59</s></button>
+            <button class="btn btn-ghost" id="btn-share">หรือแชร์ให้เพื่อน 1 คน = เปิดฟรี 💛</button>
           </div>
-          <div class="secret-item">
-            <h2><span class="emoji">⏰</span>ช่วงเวลาดีวันนี้</h2>
-            <p id="s-golden"></p>
-          </div>
-          <div class="secret-item">
-            <h2><span class="emoji">🤫</span>เคล็ดลับเสริมดวงเฉพาะคุณ</h2>
-            <p id="s-tip"></p>
-          </div>
-          <div class="secret-item">
-            <h2><span class="emoji">📱</span>วอลเปเปอร์เสริมดวงของคุณ</h2>
-            <canvas id="wp-canvas"></canvas>
-            <button class="btn btn-day" id="btn-wallpaper">ดาวน์โหลดวอลเปเปอร์ ⬇️</button>
-          </div>
+        </div>
+
+        <div class="secret-item">
+          <h2><span class="emoji">📱</span>วอลเปเปอร์เสริมดวงของคุณ</h2>
+          <div id="wp-locked" class="wp-teaser">🔒 เปิดเลขอันดับ 1 แล้วรับวอลเปเปอร์เสริมดวง 3 สีเฉพาะคุณไปเลย</div>
+          <canvas id="wp-canvas" class="hidden"></canvas>
+          <button class="btn btn-day hidden" id="btn-wallpaper">ดาวน์โหลดวอลเปเปอร์ ⬇️</button>
         </div>
       </div>
     </section>

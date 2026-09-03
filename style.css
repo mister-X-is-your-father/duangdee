@@ -112,6 +112,22 @@ h1, h2, h3, .btn { font-family: "Prompt", sans-serif; }
 .secret-label { text-align: center; color: var(--muted); font-size: 0.85rem; }
 .secret-item { margin-top: 14px; }
 
+/* lucky number ranking (แสดง 3/2 · ล็อกอันดับ 1 = จุดพีค) */
+.lucky-rank { list-style: none; margin: 10px 0 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.rank-row { display: flex; align-items: center; gap: 12px; background: rgba(255, 255, 255, 0.05); border-radius: 12px; padding: 11px 14px; }
+.rank-badge { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; font-family: "Prompt"; font-weight: 700; font-size: 0.95rem; flex: none; color: #2a1f0e; }
+.rank-badge.b3 { background: #cd7f4e; color: #fff; }
+.rank-badge.b2 { background: #c9d0d8; }
+.rank-badge.b1 { background: linear-gradient(135deg, #ffe29a, var(--gold)); }
+.rank-num { font-family: "Prompt"; font-weight: 700; font-size: 1.5rem; letter-spacing: 3px; color: var(--text); }
+.rank-row.rank-top { background: linear-gradient(120deg, rgba(244, 201, 93, 0.20), rgba(255, 255, 255, 0.04)); border: 1px solid var(--gold); box-shadow: 0 6px 20px rgba(244, 201, 93, 0.18); }
+.rank-top .rank-num { color: var(--gold); font-size: 1.9rem; }
+.rank-top .rk1-tag { margin-left: auto; font-size: 1.15rem; }
+.rk1-blur { filter: blur(10px); user-select: none; -webkit-user-select: none; }
+.rank-lead { font-size: 0.94rem; color: var(--gold); margin-top: 10px; line-height: 1.7; }
+#lock-cta { margin-top: 4px; }
+.wp-teaser { text-align: center; color: var(--muted); border: 1px dashed var(--card-border); border-radius: 12px; padding: 18px 14px; margin-top: 8px; font-size: 0.9rem; }
+
 /* wallpaper */
 #wp-canvas { width: 100%; max-width: 250px; display: block; margin: 12px auto; border-radius: 16px; border: 1px solid var(--card-border); }
 
