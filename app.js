@@ -52,7 +52,7 @@ function computeReading(name, d, m, yearInput) {
   const day = DAYS[dayIdx];
 
   const tip = SECRET_TIPS[(seed >>> 7) % SECRET_TIPS.length]
-    .replaceAll("{color}", day.color).replaceAll("{day}", day.name);
+    .replaceAll("{color}", day.colors.lucky.name).replaceAll("{day}", day.name);
 
   return {
     name: name.trim(), ce, dayIdx, zIdx, seed,
@@ -106,18 +106,38 @@ function onSubmit() {
 
 function renderReading(r) {
   $("r-title").textContent = (r.name ? "คุณ" + r.name : "คุณ") + " · " + r.zodiac.emoji + " " + r.zodiac.name;
-  $("r-sub").textContent = "เกิด" + r.day.name + " " + r.day.color + " · " + r.day.power;
+  $("r-sub").textContent = "เกิด" + r.day.name + " · " + r.day.power;
   $("r-week").textContent = "ดวงวันนี้ · " + todayLabel();
   $("r-trait").textContent = r.day.trait;
   document.documentElement.style.setProperty("--day-color", r.day.hex);
   document.documentElement.style.setProperty("--day-accent", r.day.accent);
+  renderColors(r);
   renderLuckyItem(r);
   $("r-love").textContent = r.zodiac.love + " " + r.twists[0];
   $("r-work").textContent = r.zodiac.work + " " + r.twists[1];
   $("r-money").textContent = r.zodiac.money + " " + r.twists[2];
 }
 
+// สีมงคล/เรียกเงิน/กาลกิณี ประจำวันเกิด + ข้อความแบบ "แม่หมอพูดกับคุณคนเดียว"
+// (จิตวิทยา: เข้าใจ + ยอมรับ + ให้กำลังใจ — ไม่ใช่คำปลอบถูก ๆ)
+function renderColors(r) {
+  const c = r.day.colors;
+  const nick = r.name ? "คุณ" + r.name : "คุณ";
+  $("col-lucky").textContent = c.lucky.name;
+  $("col-money").textContent = c.money.name;
+  $("col-avoid").textContent = c.avoid.name;
+  $("col-lucky-sw").style.background = c.lucky.hex;
+  $("col-money-sw").style.background = c.money.hex;
+  $("col-avoid-sw").style.background = c.avoid.hex;
+  $("col-note").textContent =
+    "แม่ดูออกนะว่า" + nick + "เป็นคนเก็บความรู้สึกเก่ง แบกไว้คนเดียวบ่อย ๆ — สัปดาห์นี้ให้" +
+    c.lucky.name + "อยู่ใกล้ตัว มันคือสีที่หนุน 'ตัวจริง' ของคุณ · อยากให้เงินเข้าคล่อง พก" +
+    c.money.name + "ติดตัวไว้ · ส่วน" + c.avoid.name + "เลี่ยงได้ก็ดี ไม่ต้องซีเรียส แม่แค่อยากให้ลูกได้เปรียบไว้ก่อน 🐾";
+}
+
 // アフィリエイト: 承認後に Involve Asia のディープリンクベースへ差替える
+// ★防火壁ルール(規約審査 reports/10): アフィリンクは「ไอเทมเรียกทรัพย์」ブロック(=吉色/物販の文脈)のみ。
+//   เลขนำโชค(数字)を主役にするサーフェスにアフィリンクを載せない=ギャンブル隣接判定でBAN回避。
 const AFFILIATE_BASE = null; // 例: "https://invol.co/aff_m?offer_id=...&url="
 function shopeeUrl(q) {
   const raw = "https://shopee.co.th/search?keyword=" + encodeURIComponent(q);
@@ -142,7 +162,11 @@ function revealSecret() {
   $("s-tip").textContent = r.tip;
   drawWallpaper($("wp-canvas"), {
     hex: r.day.hex, accent: r.day.accent, name: r.name,
-    lucky2: r.lucky2, lucky3: r.lucky3, dayName: r.day.name, seed: r.seed
+    lucky2: r.lucky2, lucky3: r.lucky3, dayName: r.day.name, seed: r.seed,
+    luckyName: r.day.colors.lucky.name,
+    moneyName: r.day.colors.money.name, moneyHex: r.day.colors.money.hex,
+    avoidName: r.day.colors.avoid.name, avoidHex: r.day.colors.avoid.hex,
+    golden: r.goldenSlot
   });
 }
 
