@@ -10,15 +10,15 @@ import { render } from "../../kamishibai/kamishibai.mjs";
 
 const ROOT = dirname(fileURLToPath(import.meta.url));
 
-// ---------- コンテンツ定義（サイト content.js と整合） ----------
+// ---------- コンテンツ定義（サイト content.js と整合＝生まれ曜日の吉色 hex） ----------
 const DAYS = [
-  { name: "วันอาทิตย์", color: "สีแดง", hex: "#e63946", accent: "#ffb4a2" },
-  { name: "วันจันทร์", color: "สีเหลือง", hex: "#f4a261", accent: "#ffe8b0" },
-  { name: "วันอังคาร", color: "สีชมพู", hex: "#ff5d8f", accent: "#ffc2d4" },
-  { name: "วันพุธ", color: "สีเขียว", hex: "#2a9d8f", accent: "#b7f0e3" },
-  { name: "วันพฤหัสบดี", color: "สีส้ม", hex: "#f77f00", accent: "#ffd166" },
-  { name: "วันศุกร์", color: "สีฟ้า", hex: "#4895ef", accent: "#bde0fe" },
-  { name: "วันเสาร์", color: "สีม่วง", hex: "#9d4edd", accent: "#e0aaff" }
+  { name: "วันอาทิตย์", hex: "#ff5d8f", accent: "#ffc2d4" },
+  { name: "วันจันทร์", hex: "#2e9e5b", accent: "#b7f0cf" },
+  { name: "วันอังคาร", hex: "#9d4edd", accent: "#e0aaff" },
+  { name: "วันพุธ", hex: "#f77f00", accent: "#ffd166" },
+  { name: "วันพฤหัสบดี", hex: "#2f6fd0", accent: "#bdd4fe" },
+  { name: "วันศุกร์", hex: "#f5c518", accent: "#fff0b0" },
+  { name: "วันเสาร์", hex: "#9c6b3f", accent: "#e0b483" }
 ];
 
 // ランク帯別のひとこと運勢（ポジティブ・クッション必須 / 不安を煽らない）
@@ -97,7 +97,7 @@ const BASE_CSS = `
   .lucky { font-size:230px; font-weight:800; color:#f4c95d; text-shadow:0 0 80px #f4c95d66; }
 `;
 const page = (inner) => `<!DOCTYPE html><html><head><meta charset="utf-8">${FONT}<style>${BASE_CSS}</style></head>
-<body><div class="stars"></div>${inner}<div class="brand">🐱 ดวงดี๊ดี deedee.me · เพื่อความบันเทิง</div></body></html>`;
+<body><div class="stars"></div>${inner}<div class="brand">🐱 ดวงดี๊ดี duangdeedee.me · เพื่อความบันเทิง</div></body></html>`;
 
 const rowHtml = (i) => {
   const d = rank[i];
@@ -152,7 +152,7 @@ const outMp4 = render({
   slides
 });
 
-const caption = `ดวงประจำวันที่ ${thDate} 🔮 เกิดวันไหนปังสุด? เลขนำโชควันนี้ ${lucky} ✨ ดูดวงเจาะลึกฟรีที่ deedee.me (ลิงก์ในไบโอ) 🐱
+const caption = `ดวงประจำวันที่ ${thDate} 🔮 เกิดวันไหนปังสุด? เลขนำโชควันนี้ ${lucky} ✨ ดูดวงเจาะลึกฟรีที่ duangdeedee.me (ลิงก์ในไบโอ) 🐱
 #ดูดวง #สายมู #ดวงรายวัน #ดวงประจำวัน #เลขนำโชค #มูเตลู #ดูดวงฟรี #fyp`;
 writeFileSync(join(outDir, "caption.txt"), caption);
 console.log(`[gen-daily] ✅ ${outMp4}`);
