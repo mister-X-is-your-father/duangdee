@@ -119,6 +119,9 @@ h1, h2, h3, .btn { font-family: "Prompt", sans-serif; }
 .rank-badge.b3 { background: #cd7f4e; color: #fff; }
 .rank-badge.b2 { background: #c9d0d8; }
 .rank-badge.b1 { background: linear-gradient(135deg, #ffe29a, var(--gold)); }
+.rank-body { display: flex; flex-direction: column; gap: 3px; flex: 1; min-width: 0; }
+.rank-cap { font-size: 0.76rem; color: var(--muted); line-height: 1.45; }
+.rank-cap-top { color: rgba(255, 245, 220, 0.9); }
 .rank-num { font-family: "Prompt"; font-weight: 700; font-size: 1.5rem; letter-spacing: 3px; color: var(--text); }
 .rank-row.rank-top { background: linear-gradient(120deg, rgba(244, 201, 93, 0.20), rgba(255, 255, 255, 0.04)); border: 1px solid var(--gold); box-shadow: 0 6px 20px rgba(244, 201, 93, 0.18); }
 .rank-top .rank-num { color: var(--gold); font-size: 1.9rem; }
