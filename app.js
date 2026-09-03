@@ -223,8 +223,8 @@ function onWaitlistSend() {
 
 async function onShareClick() {
   const data = {
-    title: "ดวงดี DuangDee",
-    text: "ลองดูดวงฟรีกับน้องดวงดี 🐱🔮 บอกแค่วันเกิดก็รู้ดวงทั้งสัปดาห์!",
+    title: "ดวงดี๊ดี DuangDeeDee",
+    text: "ลองดูดวงฟรีกับแม่หมอดีดี แมวเก้าชีวิต 🐱🔮 บอกแค่วันเกิดก็รู้ดวงทั้งสัปดาห์!",
     url: location.origin + location.pathname + "?s=sh"
   };
   try {

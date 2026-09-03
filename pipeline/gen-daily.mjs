@@ -82,7 +82,7 @@ const BASE_CSS = `
     radial-gradient(2px 2px at 12% 20%, #fff8, transparent 60%), radial-gradient(2px 2px at 78% 12%, #fff7, transparent 60%),
     radial-gradient(3px 3px at 88% 44%, #f4c95d99, transparent 60%), radial-gradient(2px 2px at 22% 70%, #fff6, transparent 60%),
     radial-gradient(2px 2px at 60% 85%, #f4c95d88, transparent 60%), radial-gradient(2px 2px at 40% 40%, #fff5, transparent 60%); }
-  .brand { position:absolute; bottom:56px; left:0; right:0; font-size:34px; color:#ffffff88; font-weight:600; }
+  .brand { position:absolute; bottom:56px; left:0; right:0; font-size:34px; color:#ffffffcc; font-weight:600; }
   .cat { font-size:120px; line-height:1; }
   h1 { font-size:88px; font-weight:800; line-height:1.3; }
   .gold { color:#f4c95d; }
@@ -97,7 +97,7 @@ const BASE_CSS = `
   .lucky { font-size:230px; font-weight:800; color:#f4c95d; text-shadow:0 0 80px #f4c95d66; }
 `;
 const page = (inner) => `<!DOCTYPE html><html><head><meta charset="utf-8">${FONT}<style>${BASE_CSS}</style></head>
-<body><div class="stars"></div>${inner}<div class="brand">🐱 ดวงดี DuangDee · เพื่อความบันเทิง</div></body></html>`;
+<body><div class="stars"></div>${inner}<div class="brand">🐱 ดวงดี๊ดี deedee.me · เพื่อความบันเทิง</div></body></html>`;
 
 const rowHtml = (i) => {
   const d = rank[i];
@@ -108,8 +108,8 @@ const rowHtml = (i) => {
 
 const slides = [
   { // S1 hook
-    html: page(`<div class="cat">🐱🔮</div><h1>ดวงประจำวัน<br><span class="gold">${thDate}</span><br>เกิดวันไหน<span class="gold">ปังสุด?</span></h1><div class="chip">น้องดวงดีจัดอันดับให้แล้ว!</div>`),
-    tts: `สวัสดีค่ะ น้องดวงดีมาแล้ว ดวงประจำวันที่ ${thDate} วันเกิดไหนจะปังที่สุด มาดูกันเลยค่ะ`
+    html: page(`<div class="cat">🐱🔮</div><h1>ดวงประจำวัน<br><span class="gold">${thDate}</span><br>เกิดวันไหน<span class="gold">ปังสุด?</span></h1><div class="chip">แม่หมอดีดีจัดอันดับให้แล้ว!</div>`),
+    tts: `สวัสดีจ้ะ แม่หมอดีดีมาแล้ว ดวงประจำวันที่ ${thDate} วันเกิดไหนจะปังที่สุด มาดูกันเลยจ้ะ`
   },
   { // S2 อันดับ 7-6
     html: page(`<h1>อันดับ <span class="gold">7 – 6</span></h1>${rowHtml(6)}${rowHtml(5)}`),
@@ -152,7 +152,7 @@ const outMp4 = render({
   slides
 });
 
-const caption = `ดวงประจำวันที่ ${thDate} 🔮 เกิดวันไหนปังสุด? เลขนำโชควันนี้ ${lucky} ✨ ดูดวงเจาะลึกของคุณฟรีที่ลิงก์ในไบโอ 🐱
+const caption = `ดวงประจำวันที่ ${thDate} 🔮 เกิดวันไหนปังสุด? เลขนำโชควันนี้ ${lucky} ✨ ดูดวงเจาะลึกฟรีที่ deedee.me (ลิงก์ในไบโอ) 🐱
 #ดูดวง #สายมู #ดวงรายวัน #ดวงประจำวัน #เลขนำโชค #มูเตลู #ดูดวงฟรี #fyp`;
 writeFileSync(join(outDir, "caption.txt"), caption);
 console.log(`[gen-daily] ✅ ${outMp4}`);

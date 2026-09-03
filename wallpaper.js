@@ -70,7 +70,7 @@ function drawWallpaper(canvas, opts) {
   // ข้อความ
   ctx.fillStyle = "#ffffff";
   ctx.font = "600 64px Prompt, sans-serif";
-  ctx.fillText(opts.name ? "ดวงดีของ " + opts.name : "ดวงดีของฉัน", cx, H * 0.62);
+  ctx.fillText(opts.name ? "ดวงดี๊ดีของ " + opts.name : "ดวงดี๊ดีของฉัน", cx, H * 0.62);
   ctx.fillStyle = opts.accent;
   ctx.font = "500 46px Prompt, sans-serif";
   ctx.fillText("เลขนำโชค " + opts.lucky2 + " · " + opts.lucky3, cx, H * 0.62 + 80);
@@ -81,7 +81,7 @@ function drawWallpaper(canvas, opts) {
   // ลายเซ็นแบรนด์
   ctx.fillStyle = "rgba(255,255,255,0.55)";
   ctx.font = "500 34px Prompt, sans-serif";
-  ctx.fillText("🐱 ดวงดี DuangDee", cx, H - 90);
+  ctx.fillText("🐱 ดวงดี๊ดี · deedee.me", cx, H - 90);
 }
 
 function shade(hex, amt) {
