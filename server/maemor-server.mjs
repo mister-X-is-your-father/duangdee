@@ -4,7 +4,7 @@
 // エンジン: ①ANTHROPIC_API_KEY があれば API(Haiku) を優先
 //          ②キー無し/失敗時は leo の `claude` CLI (Maxプラン認証) にフォールバック = テスト用
 import { createServer } from "node:http";
-import { execFile } from "node:child_process";
+import { spawn } from "node:child_process";
 
 const PORT = 8977;
 const KEY = process.env.ANTHROPIC_API_KEY && /^sk-ant-/.test(process.env.ANTHROPIC_API_KEY)
@@ -92,17 +92,24 @@ async function apiReading(user) {
 }
 
 // テスト用フォールバック: Claude Code CLI(Maxプラン認証)をprintモードで叩く
+// stdinを閉じる(ignore)ことでCLIのstdin待ちハングを回避。MCPは読み込ませない。
 function cliReading(user) {
   return new Promise((resolve, reject) => {
-    execFile(CLAUDE_BIN,
-      ["-p", user, "--system-prompt", SYSTEM, "--model", MODEL, "--output-format", "text"],
-      { env: { ...process.env, HOME: "/home/neo" }, timeout: 90000, maxBuffer: 1 << 20 },
-      (err, stdout, stderr) => {
-        if (err) return reject(new Error("cli " + err.message + " " + String(stderr).slice(0, 150)));
-        const t = String(stdout).trim();
-        if (!t) return reject(new Error("cli empty output"));
-        resolve(t);
-      });
+    const child = spawn(CLAUDE_BIN,
+      ["-p", user, "--system-prompt", SYSTEM, "--model", MODEL, "--output-format", "text",
+       "--strict-mcp-config", "--mcp-config", '{"mcpServers":{}}'],
+      { env: { ...process.env, HOME: "/home/neo" }, stdio: ["ignore", "pipe", "pipe"] });
+    let out = "", err = "";
+    const timer = setTimeout(() => { child.kill("SIGKILL"); reject(new Error("cli timeout 115s")); }, 115000);
+    child.stdout.on("data", (d) => { out += d; });
+    child.stderr.on("data", (d) => { err += d; });
+    child.on("error", (e) => { clearTimeout(timer); reject(new Error("cli spawn " + e.message)); });
+    child.on("close", (code) => {
+      clearTimeout(timer);
+      const t = out.trim();
+      if (t) return resolve(t);
+      reject(new Error("cli code=" + code + " " + err.slice(0, 150)));
+    });
   });
 }
 
