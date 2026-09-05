@@ -152,13 +152,23 @@ const slides = [
 ].map((s) => ({ ...s, seek: true, loop: 3.0, hold: 0.45 }));
 
 // ---------- 生成 ----------
-const outDir = join(ROOT, "out", iso + "-pick3");
+// TTS エンジン: $TTS_ENGINE = botnoi | elevenlabs | edge。未指定は anim.mjs の自動判定(ELEVENLABS鍵+声IDがあれば elevenlabs、無ければ edge)
+//  botnoi(タイ企業ネイティブ声) は $BOTNOI_API_KEY + $BOTNOI_SPEAKER(話者ID。候補: 32=น้าเกรซ warm / 50=ครูดีดี๊ slow・trust / 60=เหมียว)。V2声=2 point/文字
+const ttsEngine = process.env.TTS_ENGINE || undefined;
+const engineEff = ttsEngine || ((process.env.ELEVENLABS_API_KEY && process.env.ELEVENLABS_VOICE_ID) ? "elevenlabs" : "edge");
+const ttsChars = slides.reduce((a, s) => a + (s.tts || "").length, 0);
+const outDir = join(ROOT, "out", iso + "-pick3" + (process.env.PICK3_SUFFIX || ""));   // PICK3_SUFFIX=-botnoi 等で別フォルダに出し比較できる
+if (process.env.PICK3_DRY) {   // 生成せず文字数だけ(Botnoi の point 見積り用)
+  console.log(`[pick3] DRY ${iso} engine=${engineEff} tts chars=${ttsChars} (botnoi V2 ≈ ${ttsChars * 2} point)`);
+  process.exit(0);
+}
 mkdirSync(outDir, { recursive: true });
-console.log(`[pick3] ${iso} — テーマ: ${themes.map((t) => t.key).join(" / ")} | hook#${HOOKS.indexOf(hook)} pal#${PALETTES.indexOf(pal)}`);
+console.log(`[pick3] ${iso} — テーマ: ${themes.map((t) => t.key).join(" / ")} | hook#${HOOKS.indexOf(hook)} pal#${PALETTES.indexOf(pal)} | tts=${engineEff} ${ttsChars}字`);
 const outMp4 = await renderAnimated({
   out: join(outDir, "pick3.mp4"), size: [1080, 1920], fps: 30, padSec: 0.35, fade: 0.25,
-  voice: "th-TH-PremwadeeNeural", rate: "+2%",            // edge-tts 用(ELEVENLABS_API_KEY + ELEVENLABS_VOICE_ID があれば自動で elevenlabs)
-  ttsTempo: process.env.ELEVENLABS_API_KEY ? 1.18 : 1.0,   // ElevenLabs v3 はタイ語がゆっくり(実測 edge比 +20%)→ピッチ不変で1.18倍速。edge は素のまま
+  ttsEngine, botnoiSpeaker: process.env.BOTNOI_SPEAKER,
+  voice: "th-TH-PremwadeeNeural", rate: "+2%",            // edge-tts 用
+  ttsTempo: engineEff === "elevenlabs" ? 1.18 : 1.0,      // ElevenLabs v3 はタイ語がゆっくり(実測 edge比 +20%)→ピッチ不変で1.18倍速。botnoi/edge は素のまま
   music: join(ROOT, "assets", "bgm-warm.mp3"), musicVol: 0.10,
   slides
 }, ROOT);
