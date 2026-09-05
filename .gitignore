@@ -3,4 +3,5 @@ nohup.out
 node_modules/
 pipeline/out/
 server/.env
+pipeline/.env.local
 server/.cf-token
