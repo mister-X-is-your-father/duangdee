@@ -151,6 +151,14 @@ const slides = [
   { html: page(520, `${stage}<h1>${close.screen}</h1><div class="sub">สีมงคลตามวันเกิดคุณ →<br><span class="gold">duangdeedee.me</span></div>`), tts: close.tts }
 ].map((s) => ({ ...s, seek: true, loop: 3.0, hold: 0.45 }));
 
+// 表紙カット(0.45秒・無音・フェードイン無し) = TikTok/IG の既定サムネ(1フレーム目)。FYPでは自動再生で見えないが、
+// プロフィール一覧・検索・フォロー中タブで効く。引き文句「เลือก 1 ใน 3」+日付+3つの玉+猫、パレットは日替わり
+const TH_MONTHS = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
+const [, cm, cd] = iso.split("-").map(Number);
+const coverHtml = page(460, `${stage}<div class="chip" style="--c:#f4c95d;margin-top:4px">ดวงวันนี้ · ${cd} ${TH_MONTHS[cm - 1]}</div><h1 style="font-size:124px;margin-top:18px">เลือก <span class="gold">1 ใน 3</span> 🔮</h1><div class="sub" style="font-size:56px;color:#fff">แม่หมอดีดีเห็นอะไร<br>ในดวงคุณ?</div><div class="orbs" style="margin-top:40px"><div class="orb">1</div><div class="orb">2</div><div class="orb">3</div></div>`);
+const coverSlide = { html: coverHtml, dur: 0.45, noFadeIn: true };
+if (!process.env.PICK3_NO_COVER) slides.unshift(coverSlide);
+
 // ---------- 生成 ----------
 // TTS エンジン: $TTS_ENGINE = botnoi | elevenlabs | edge。未指定は anim.mjs の自動判定(ELEVENLABS鍵+声IDがあれば elevenlabs、無ければ edge)
 //  botnoi(タイ企業ネイティブ声) は $BOTNOI_API_KEY + $BOTNOI_SPEAKER(話者ID。候補: 32=น้าเกรซ warm / 50=ครูดีดี๊ slow・trust / 60=เหมียว)。V2声=2 point/文字
@@ -164,13 +172,15 @@ if (process.env.PICK3_DRY) {   // 生成せず文字数だけ(Botnoi の point �
 }
 mkdirSync(outDir, { recursive: true });
 console.log(`[pick3] ${iso} — テーマ: ${themes.map((t) => t.key).join(" / ")} | hook#${HOOKS.indexOf(hook)} pal#${PALETTES.indexOf(pal)} | tts=${engineEff} ${ttsChars}字`);
+const coverOnly = !!process.env.PICK3_COVER_ONLY;   // PICK3_COVER_ONLY=1: 表紙カットだけ cover.mp4 に描画(既存動画へ後付けする用、TTS消費ゼロ)
 const outMp4 = process.env.PICK3_CAPTION_ONLY ? join(outDir, "pick3.mp4") : await renderAnimated({   // PICK3_CAPTION_ONLY=1: 動画は作らず caption/meta だけ更新
-  out: join(outDir, "pick3.mp4"), size: [1080, 1920], fps: 30, padSec: 0.35, fade: 0.25,
+  out: join(outDir, coverOnly ? "cover.mp4" : "pick3.mp4"), size: [1080, 1920], fps: 30, padSec: 0.35, fade: 0.25,
   ttsEngine, botnoiSpeaker: process.env.BOTNOI_SPEAKER,
+  ttsCache: join(ROOT, ".tts-cache"),                     // 同じ声×同じ文は再合成しない(再レンダ無料)。gitignore 済み
   voice: "th-TH-PremwadeeNeural", rate: "+2%",            // edge-tts 用
   ttsTempo: engineEff === "elevenlabs" ? 1.18 : 1.0,      // ElevenLabs v3 はタイ語がゆっくり(実測 edge比 +20%)→ピッチ不変で1.18倍速。botnoi/edge は素のまま
-  music: join(ROOT, "assets", "bgm-warm.mp3"), musicVol: 0.10,
-  slides
+  music: coverOnly ? undefined : join(ROOT, "assets", "bgm-warm.mp3"), musicVol: 0.10,
+  slides: coverOnly ? [coverSlide] : slides
 }, ROOT);
 
 // キャプションも日替わり(同一文の連投=テンプレ反復シグナルを避ける)。テーマ名を織り込み、CTA文とタグ末尾を seed で回す
