@@ -164,7 +164,7 @@ if (process.env.PICK3_DRY) {   // 生成せず文字数だけ(Botnoi の point �
 }
 mkdirSync(outDir, { recursive: true });
 console.log(`[pick3] ${iso} — テーマ: ${themes.map((t) => t.key).join(" / ")} | hook#${HOOKS.indexOf(hook)} pal#${PALETTES.indexOf(pal)} | tts=${engineEff} ${ttsChars}字`);
-const outMp4 = await renderAnimated({
+const outMp4 = process.env.PICK3_CAPTION_ONLY ? join(outDir, "pick3.mp4") : await renderAnimated({   // PICK3_CAPTION_ONLY=1: 動画は作らず caption/meta だけ更新
   out: join(outDir, "pick3.mp4"), size: [1080, 1920], fps: 30, padSec: 0.35, fade: 0.25,
   ttsEngine, botnoiSpeaker: process.env.BOTNOI_SPEAKER,
   voice: "th-TH-PremwadeeNeural", rate: "+2%",            // edge-tts 用
@@ -173,8 +173,16 @@ const outMp4 = await renderAnimated({
   slides
 }, ROOT);
 
-const caption = `${hook.screen.split("\n")[0].replace(/[🐾✨👀]/g, "").trim()} เลือกลูกแก้ว 1 ลูก แล้วดูว่าแม่หมอดีดีเห็นอะไร 🔮 คุณเลือกลูกไหน? บอกแม่ในคอมเมนต์นะ 🐾 สีมงคลตามวันเกิดของคุณ → duangdeedee.me (ลิงก์ในไบโอ)
-#สายมู #ดูดวง #เสริมดวง #ดวงรายวัน #มูเตลู #แม่หมอดีดี #fyp`;
+// キャプションも日替わり(同一文の連投=テンプレ反復シグナルを避ける)。テーマ名を織り込み、CTA文とタグ末尾を seed で回す
+const CTAS = [
+  (th) => `เลือกลูกแก้ว 1 ลูก แล้วดูว่าแม่หมอดีดีเห็นอะไร 🔮 วันนี้มี ${th.join(" · ")} คุณเลือกลูกไหน? บอกแม่ในคอมเมนต์นะ 🐾`,
+  (th) => `3 ลูกแก้ว 3 เรื่อง (${th.join(" / ")}) ใจคุณเรียกลูกไหน… แตะค้างไว้แล้วมาดูกัน 🔮 คอมเมนต์เลขลูกที่เลือกให้แม่หน่อยนะ 🐾`,
+  (th) => `แม่หมอดีดีมีของขวัญ 3 อย่าง ${th.join(" · ")} เลือกได้แค่ 1 นะลูก 🔮 เลือกแล้วบอกแม่ในคอมเมนต์ แม่รออ่านอยู่ 🐾`,
+  (th) => `หยุดก่อน… เลือกลูกแก้วที่ใจเรียก 1 ลูก 🔮 (${th.join(" · ")}) แล้วดูว่าแม่เห็นอะไรในดวงคุณ บอกแม่หน่อยว่าเลือกลูกไหน 🐾`
+];
+const TAIL_TAGS = ["#fyp", "#fypシ", "#สายมูต้องรู้", "#ดวงวันนี้"];
+const caption = `${hook.screen.split("\n")[0].replace(/[🐾✨👀]/g, "").trim()} ${pick(CTAS, "cta")(themes.map((t) => t.key))} สีมงคลตามวันเกิดของคุณ → duangdeedee.me (ลิงก์ในไบโอ)
+#สายมู #ดูดวง #เสริมดวง #ดวงรายวัน #มูเตลู #แม่หมอดีดี ${pick(TAIL_TAGS, "tag")}`;
 writeFileSync(join(outDir, "caption.txt"), caption);
 writeFileSync(join(outDir, "meta.json"), JSON.stringify({ iso, format: "pick3", themes: themes.map((t) => t.key), hook: hook.screen, palette: pal }, null, 2));
 console.log(`[pick3] ✅ ${outMp4}`);
