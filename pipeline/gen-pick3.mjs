@@ -102,8 +102,8 @@ const THEMES = [
 ];
 const CLOSES = [
   // クローズは短く(完了率優先)。URLは画面に出すので読みは軽く
-  { screen: "คุณเลือกลูกไหน? 🐾\nบอกแม่หน่อย", tts: "เลือกลูกไหน… บอกแม่หน่อยนะ" },
-  { screen: "โดนไหม? 😼\nบอกแม่ว่าเลือกลูกไหน", tts: "โดนไหมลูก… เลือกลูกไหน บอกแม่หน่อย" }
+  { screen: "คุณเลือกลูกไหน? 🐾\nบอกแม่หน่อย", sub: "แตะสองครั้งถ้าโดน 💛", tts: "เลือกลูกไหน… บอกแม่หน่อยนะ… โดนก็แตะสองครั้ง ให้แม่รู้" },
+  { screen: "โดนไหม? 😼\nบอกแม่ว่าเลือกลูกไหน", sub: "แตะสองครั้งถ้าโดน 💛", tts: "โดนไหมลูก… แตะสองครั้งถ้าโดน… แล้วบอกแม่ว่าเลือกลูกไหน" }
 ];
 // 話速(botnoi speed): 刺す文は速く・畳みかける、抱く文はゆっくり。同一テンポ=AI感の主因なので文ごとに変える
 const SPEED = { sting: Number(process.env.PICK3_SPEED_STING || 1.15), warm: Number(process.env.PICK3_SPEED_WARM || 1.05) };
@@ -133,7 +133,7 @@ const slides = [
       { html: page(420, `${head}<div class="msg">${L.insight}</div><div class="act">🐾 ${L.push}</div>`), tts: `${L.insight}… ${L.push}`, botnoiSpeed: SPEED.warm }
     ];
   }),
-  { html: page(520, `${stage}<h1>${close.screen}</h1><div class="sub">สีมงคลตามวันเกิดคุณ →<br><span class="gold">duangdeedee.me</span></div>`), tts: close.tts }
+  { html: page(520, `${stage}<h1>${close.screen}</h1><div class="sub">${close.sub} · สีมงคลเฉพาะคุณ →<br><span class="gold">duangdeedee.me</span></div>`), tts: close.tts }
 ].map((s) => ({ ...s, seek: true, loop: 3.0, hold: 0.3 }));
 
 // 表紙カット(0.45秒・無音・フェードイン無し) = TikTok/IG の既定サムネ(1フレーム目)。FYPでは自動再生で見えないが、

@@ -82,10 +82,10 @@ if (type === "find") {
   slides = [
     cover("หาให้เจอ 5 อย่าง 👀", "ของที่เห็นก่อน = ของนำโชควันนี้"),
     { html: page(1, `${header("ของที่ลูกเห็นก่อน 👀\n= ของนำโชคของลูกวันนี้", "มี 5 อย่างซ่อนอยู่ในห้องแม่")}${sceneHtml(false)}`, sceneCss), tts: "ของที่ลูกเห็นก่อน คือของนำโชคของลูกวันนี้… มีห้าอย่างซ่อนอยู่ในห้องแม่ หาให้เจอนะ", seek: true, loop: 3, hold: 0.2, botnoiSpeed: SPEED.fast },
-    { html: page(1, `${header("หาให้เจอ 5 อย่าง ⏳", "หยุดวิดีโอได้นะ แม่ไม่ว่า")}<div id="cd">10</div><div class="bar"><i id="barfill"></i></div>${sceneHtml(false)}${ANIM("document.getElementById('barfill').style.width=((1-t)*100).toFixed(1)+'%';document.getElementById('cd').textContent=Math.max(0,Math.ceil(10*(1-t)));")}`, sceneCss), dur: 10, seek: true, animSec: 10 },
+    { html: page(1, `${header("หาให้เจอ 5 อย่าง ⏳", "แตะหน้าจอเพื่อหยุดภาพได้นะ แม่ไม่ว่า")}<div id="cd">10</div><div class="bar"><i id="barfill"></i></div>${sceneHtml(false)}${ANIM("document.getElementById('barfill').style.width=((1-t)*100).toFixed(1)+'%';document.getElementById('cd').textContent=Math.max(0,Math.ceil(10*(1-t)));")}`, sceneCss), dur: 10, seek: true, animSec: 10 },
     { html: page(1, `${header("เฉลย ✨", "อยู่ตรงนี้ทั้ง 5 อย่าง")}${sceneHtml(true)}`, sceneCss), tts: "เฉลย… อยู่ตรงนี้ทั้งห้าอย่าง… เจอกี่อย่างลูก", seek: true, loop: 3, hold: 0.3 },
     { html: page(1, `${header("เจออะไรก่อน? 🐾", "นั่นคือของนำโชคของลูกวันนี้")}<div class="list">${placed.map((p, i) => `<div class="row"><span class="e">${p.it.e}</span><div><b>${i + 1}. ${p.it.th}</b> · ${p.it.lucky}<br>${p.it.line}</div></div>`).join("")}</div>`, sceneCss), tts: "เจอครบห้า… วันนี้ตาแหลม อย่าปล่อยโอกาสหลุดมือนะ… เจอสามสี่… ดวงดี แต่ใจลูกยังวอกแวกอยู่… เจอแค่หนึ่งสอง… ไม่ใช่ตาไม่ดี แต่ใจลูกอยู่ที่อื่น… พักบ้างนะ", seek: true, loop: 3, hold: 0.4, botnoiSpeed: SPEED.warm },
-    { html: page(520, `${STAGE}<h1>เจอกี่อย่าง? 😼\nบอกแม่หน่อย</h1><div class="sub">ส่งให้เพื่อนลองหาดู 🐾<br><span class="gold">duangdeedee.me</span></div>`), tts: "เจอกี่อย่าง บอกแม่… แล้วส่งให้เพื่อนลองหาดูนะ", seek: true, loop: 3, hold: 0.3 }
+    { html: page(520, `${STAGE}<h1>เจอกี่อย่าง? 😼\nบอกแม่หน่อย</h1><div class="sub">แตะสองครั้งถ้าเจอครบ 5 💛 · ส่งให้เพื่อนลองหาดู 🐾<br><span class="gold">duangdeedee.me</span></div>`), tts: "เจอกี่อย่าง บอกแม่… เจอครบห้าก็แตะสองครั้งให้แม่รู้… แล้วส่งให้เพื่อนลองหาดูนะ", seek: true, loop: 3, hold: 0.3 }
   ];
   caption = `หาให้เจอ 5 อย่างใน 10 วิ 👀 ของที่ลูกเห็นก่อน = ของนำโชคของลูกวันนี้ (${items.map((i) => i.e).join("")}) เจอกี่อย่าง? บอกแม่ในคอมเมนต์ แล้วส่งให้เพื่อนลองหา 🐾 สีมงคลตามวันเกิด → duangdeedee.me (พิมพ์ในเบราว์เซอร์ได้เลย)
 #สายมู #ดูดวง #แม่หมอดีดี #หาของ #เกมทายใจ`;
@@ -117,7 +117,7 @@ if (type === "zoom") {
     // 引き: 無音8秒。ease-in = 長く拡大のまま → 最後に一気に引く(答えは最後)
     { html: page(1, `<h1 style="font-size:78px;margin-top:70px">ทายสิ… นี่คืออะไร 👀</h1><div class="sub" style="font-size:40px">เห็นแล้วพิมพ์เลย · ก่อนเฉลย</div><div id="cd">8</div><div class="zoomwrap">${STAGE}</div>${ANIM("var e=Math.pow(t,2.4);var s=16-15*e;document.querySelector('.zoomwrap .stage').style.transform='scale('+s.toFixed(3)+')';document.getElementById('cd').textContent=Math.max(0,Math.ceil(8*(1-t)));")}`, zoomCss), dur: 8, seek: true, animSec: 8 },
     { html: page(560, `${STAGE}<h1 style="font-size:84px">${part.th}</h1><div class="msg">${part.line}</div><div class="act">🐾 ของนำโชควันนี้: ${part.lucky}</div>`), tts: `เฉลย… ${part.th.replace(/[^฀-๿\s]/g, "").trim()}… ${part.line}… ของนำโชคของลูกวันนี้ คือ ${part.lucky}`, seek: true, loop: 3, hold: 0.4, botnoiSpeed: SPEED.warm },
-    { html: page(520, `${STAGE}<h1>ทายถูกตอนกี่วิ? 😼\nบอกแม่หน่อย</h1><div class="sub">พรุ่งนี้แม่ซ่อนส่วนใหม่ 🐾<br><span class="gold">duangdeedee.me</span></div>`), tts: "ทายถูกตอนกี่วิ บอกแม่หน่อย… พรุ่งนี้แม่ซ่อนส่วนใหม่นะ", seek: true, loop: 3, hold: 0.3 }
+    { html: page(520, `${STAGE}<h1>ทายถูกตอนกี่วิ? 😼\nบอกแม่หน่อย</h1><div class="sub">แตะสองครั้งถ้าทายถูก 💛 · พรุ่งนี้แม่ซ่อนส่วนใหม่ 🐾<br><span class="gold">duangdeedee.me</span></div>`), tts: "ทายถูกตอนกี่วิ บอกแม่หน่อย… ทายถูกก็แตะสองครั้ง… พรุ่งนี้แม่ซ่อนส่วนใหม่นะ", seek: true, loop: 3, hold: 0.3 }
   ];
   caption = `ทายสิ… นี่คือส่วนไหนของแม่หมอดีดี 👀 ทายถูกตอนกี่วิ? บอกแม่ในคอมเมนต์ 🐾 เฉลยท้ายคลิป + ของนำโชคของลูกวันนี้ · duangdeedee.me (พิมพ์ในเบราว์เซอร์ได้เลย)
 #สายมู #ดูดวง #แม่หมอดีดี #ทายสิ #เกมทายใจ`;
@@ -148,7 +148,7 @@ if (type === "quiz") {
     { html: page(420, `${STAGE}<h1 style="font-size:74px">${q}</h1>${optsHtml(false)}`, quizCss), tts: `ทายสิ… คน${day.name} ห้ามใส่สีอะไร… หนึ่ง ${shown[0][0]}… สอง ${shown[1][0]}… สาม ${shown[2][0]}`, seek: true, loop: 3, hold: 0.2, botnoiSpeed: SPEED.fast },
     { html: page(420, `${STAGE}<h1 style="font-size:74px">${q}</h1><div id="cd">5</div><div class="bar"><i id="barfill"></i></div>${optsHtml(false)}${ANIM("document.getElementById('barfill').style.width=((1-t)*100).toFixed(1)+'%';document.getElementById('cd').textContent=Math.max(0,Math.ceil(5*(1-t)));")}`, quizCss), dur: 5, seek: true, animSec: 5 },
     { html: page(420, `${STAGE}<h1 style="font-size:74px">เฉลย ✨ ${day.avoid[0]}</h1>${optsHtml(true)}<div class="act" style="position:absolute;left:0;right:0;top:1480px">${day.avoid[0]} คือสีกาลกิณีของคน${day.name} · ใส่${day.lucky[0]}แทน จะเสริม${day.power}</div>`, quizCss), tts: `เฉลย… ${day.avoid[0]}… คือสีกาลกิณีของคน${day.name}… ใส่${day.lucky[0]}แทนนะลูก จะเสริม${day.power}`, seek: true, loop: 3, hold: 0.4, botnoiSpeed: SPEED.warm },
-    { html: page(520, `${STAGE}<h1>ตอบถูกไหม? 😼\nบอกแม่ + วันเกิดลูก</h1><div class="sub">สีครบทุกวันเกิด 🐾<br><span class="gold">duangdeedee.me</span></div>`), tts: "ตอบถูกไหมลูก… บอกแม่ พร้อมวันเกิดของลูก… แม่จะดูสีให้", seek: true, loop: 3, hold: 0.3 }
+    { html: page(520, `${STAGE}<h1>ตอบถูกไหม? 😼\nบอกแม่ + วันเกิดลูก</h1><div class="sub">แตะสองครั้งถ้าตอบถูก 💛 · สีครบทุกวันเกิด 🐾<br><span class="gold">duangdeedee.me</span></div>`), tts: "ตอบถูกไหมลูก… ถูกก็แตะสองครั้ง… แล้วบอกแม่พร้อมวันเกิดของลูก แม่จะดูสีให้", seek: true, loop: 3, hold: 0.3 }
   ];
   caption = `ทายสี 🎨 คน${day.name} ห้ามใส่สีอะไร? เฉลยท้ายคลิป ✨ ตอบถูกไหม? บอกแม่ในคอมเมนต์พร้อมวันเกิดของลูก 🐾 สีครบทุกวันเกิด → duangdeedee.me (พิมพ์ในเบราว์เซอร์ได้เลย)
 #สายมู #สีมงคล #แม่หมอดีดี #คนเกิดวัน${day.short} #เกมทายใจ`;
@@ -174,7 +174,7 @@ if (type === "screenshot") {
   slides = [
     cover("แคปหน้าจอ 📸", "แล้วดูว่าแม่ให้อะไรลูกเดือนนี้"),
     { html: page(1, `<h1 style="font-size:78px;margin-top:70px">แคปหน้าจอตอนนี้ 📸</h1><div class="sub" style="font-size:40px">ได้อะไร = แม่ให้สิ่งนั้นเดือนนี้</div><div class="deck">${cardsHtml}</div><div class="now">พร้อม… แคป!</div>${ANIM(`var n=${N},cy=${CYCLES};var i=Math.floor(t*n*cy)%n;document.querySelectorAll('.card').forEach(function(c,k){c.classList.toggle('on',k===i);});`)}`, css), tts: "แคปหน้าจอตอนนี้… ได้อะไร แม่ให้สิ่งนั้นกับลูกทั้งเดือน… พร้อมนะ… แคป!", seek: true, animSec: 8, hold: 3.5, botnoiSpeed: SPEED.fast },
-    { html: page(520, `${STAGE}<h1>ได้อะไร? 😼\nบอกแม่หน่อย</h1><div class="sub">ไม่ทัน? ดูซ้ำได้ แม่ไม่ว่า 🐾<br><span class="gold">duangdeedee.me</span></div>`), tts: "ได้อะไร บอกแม่หน่อย… ไม่ทันก็ดูซ้ำได้นะ แม่ไม่ว่า", seek: true, loop: 3, hold: 0.3 }
+    { html: page(520, `${STAGE}<h1>ได้อะไร? 😼\nบอกแม่หน่อย</h1><div class="sub">แตะสองครั้งถ้าได้อันที่ชอบ 💛 · ไม่ทัน? ดูซ้ำได้ 🐾<br><span class="gold">duangdeedee.me</span></div>`), tts: "ได้อะไร บอกแม่หน่อย… ได้อันที่ชอบก็แตะสองครั้ง… ไม่ทันก็ดูซ้ำได้นะ แม่ไม่ว่า", seek: true, loop: 3, hold: 0.3 }
   ];
   caption = `แคปหน้าจอตอนนี้ 📸 ได้อะไร = แม่ให้สิ่งนั้นกับลูกทั้งเดือน ได้อะไรบอกแม่ในคอมเมนต์ 🐾 ไม่ทันดูซ้ำได้ · duangdeedee.me (พิมพ์ในเบราว์เซอร์ได้เลย)
 #สายมู #ดูดวง #แม่หมอดีดี #แคปหน้าจอ #เกมทายใจ`;
@@ -197,9 +197,9 @@ if (type === "flash") {
   const FLASH_AT = 0.58, FLASH_LEN = 2 / (9 * 30);   // 9秒スライドの 58% 地点で 2 フレーム
   slides = [
     cover("จับให้ทัน ⚡", `คำตอบโผล่แค่ 1 กะพริบ`),
-    { html: page(420, `${STAGE}<h1 style="font-size:74px">${r.q}</h1><div class="hint">คำตอบโผล่แค่กะพริบเดียว… หยุดให้ทันนะ ⚡</div>`), tts: `${r.q.replace("\n", " ")}… แม่จะโชว์คำตอบแค่กะพริบเดียว… หยุดให้ทันนะลูก`, seek: true, loop: 3, hold: 0.2, botnoiSpeed: SPEED.fast },
+    { html: page(420, `${STAGE}<h1 style="font-size:74px">${r.q}</h1><div class="hint">คำตอบโผล่แค่กะพริบเดียว… แตะหน้าจอให้ทันนะ ⚡</div>`), tts: `${r.q.replace("\n", " ")}… แม่จะโชว์คำตอบแค่กะพริบเดียว… แตะหน้าจอหยุดให้ทันนะลูก`, seek: true, loop: 3, hold: 0.2, botnoiSpeed: SPEED.fast },
     { html: page(420, `${STAGE}<h1 style="font-size:74px">${r.q}</h1><div class="ans"><div class="sw" style="background:${r.hex}"></div><div class="t">${r.a}</div></div><div class="hint">👀 อย่ากะพริบตา</div>${ANIM(`var on=(t>=${FLASH_AT}&&t<${FLASH_AT}+${FLASH_LEN.toFixed(5)});document.querySelector('.ans').classList.toggle('on',on);document.getElementById('cat').style.opacity=on?0.15:1;`)}`, css), dur: 9, seek: true, animSec: 9 },
-    { html: page(520, `${STAGE}<h1>หยุดทันไหม? 😼\nบอกแม่ว่าสีอะไร</h1><div class="sub">ไม่ทัน? ดูซ้ำสิ แม่รอ 🐾<br><span class="gold">duangdeedee.me</span></div>`), tts: "หยุดทันไหมลูก… บอกแม่ว่าสีอะไร… ไม่ทันก็ดูซ้ำสิ แม่รอ", seek: true, loop: 3, hold: 0.3 }
+    { html: page(520, `${STAGE}<h1>หยุดทันไหม? 😼\nบอกแม่ว่าสีอะไร</h1><div class="sub">ทันก็แตะสองครั้ง 💛 · ไม่ทัน? ดูซ้ำสิ แม่รอ 🐾<br><span class="gold">duangdeedee.me</span></div>`), tts: "หยุดทันไหมลูก… บอกแม่ว่าสีอะไร… ไม่ทันก็ดูซ้ำสิ แม่รอ", seek: true, loop: 3, hold: 0.3 }
   ];
   caption = `จับให้ทัน ⚡ ${r.q.replace("\n", " ")} คำตอบโผล่แค่กะพริบเดียว หยุดทันไหม? บอกแม่ในคอมเมนต์ 🐾 สีครบทุกวันเกิด → duangdeedee.me (พิมพ์ในเบราว์เซอร์ได้เลย)
 #สายมู #สีมงคล #แม่หมอดีดี #คนเกิดวัน${day.short} #จับให้ทัน`;
@@ -220,7 +220,7 @@ if (type === "lucky") {
   slides = [
     cover("ถ้าคลิปนี้โผล่มา ✨", "แปลว่าดวงลูกกำลังเปิด"),
     { html: page(520, `${STAGE}<h1 style="font-size:78px">${b.t}</h1><div class="msg">${b.l}</div><div class="seal"><div id="seal">🐾</div></div>${ANIM("var e=Math.min(1,Math.max(0,(t-0.55)/0.25));var s=1.4*e-0.4*e*e;document.getElementById('seal').style.transform='scale('+Math.max(0,s).toFixed(3)+')';")}`, css), tts: `${b.t.replace("\n", " ")}… ${b.l}`, seek: true, animSec: 6, hold: 0.6, botnoiSpeed: SPEED.warm },
-    { html: page(520, `${STAGE}<h1>รับไว้นะลูก 💛\nพิมพ์ "รับ"</h1><div class="sub">ส่งต่อให้คนที่ลูกอยากให้ดวงเปิด 🐾<br><span class="gold">duangdeedee.me</span></div>`), tts: "รับไว้นะลูก… พิมพ์ว่า รับ… แล้วส่งต่อให้คนที่ลูกอยากให้ดวงเปิด", seek: true, loop: 3, hold: 0.3 }
+    { html: page(520, `${STAGE}<h1>รับไว้นะลูก 💛\nแตะสองครั้ง + พิมพ์ "รับ"</h1><div class="sub">ส่งต่อให้คนที่ลูกอยากให้ดวงเปิด 🐾<br><span class="gold">duangdeedee.me</span></div>`), tts: "รับไว้นะลูก… แตะสองครั้ง แล้วพิมพ์ว่า รับ… แล้วส่งต่อให้คนที่ลูกอยากให้ดวงเปิด", seek: true, loop: 3, hold: 0.3 }
   ];
   caption = `${b.t.replace("\n", " ")} 🐾 รับไว้พิมพ์ "รับ" แล้วส่งต่อให้คนที่อยากให้ดวงเปิด · เพื่อความบันเทิงและกำลังใจ · duangdeedee.me (พิมพ์ในเบราว์เซอร์ได้เลย)
 #สายมู #ดูดวง #แม่หมอดีดี #ดวงเปิด #รับโชค`;
