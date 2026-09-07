@@ -1,0 +1,6 @@
+{"date":"2026-09-07","takenAt":"2026-09-07T22:25+09:00","profile":{"followers":4,"following":1,"likes":14},
+ "videos":[
+  {"id":"7682776321377733909","posted":"2026/9/7","format":"short","durationSec":18,"views":"0","avgWatch":"0","fullWatchPct":"0","newFollowers":"0","dropAt":null,"traffic":"","headCounts":["0","0","0","0","0"],"audience":"(100視聴未満)"},
+  {"id":"7682420348167523605","posted":"2026/9/6","format":"pick3","durationSec":44,"views":"221","avgWatch":"5.11","fullWatchPct":"2.4","newFollowers":"0","dropAt":"0:02","traffic":"おすすめ 97.6% 個人プロフィール 1.6% ダイレクトメッセージ 0.4% 検索 0.4%","headCounts":["221","5","0","0","0"],"audience":"年齢 18-24 6% 25-34 32% 35-44 38% 45-54 14% 55+ 10% / 女性 80% 男性 20% / タイ 85.9% 日本 6.9% ラオス 3.6%","likeAt":"0:00 (20%)"},
+  {"id":"7682348071270878484","posted":"2026/9/6","format":"pick3","durationSec":42,"views":"285","avgWatch":"5.62","fullWatchPct":"2.9","newFollowers":"3","dropAt":"0:01","traffic":"おすすめ 98.1% 個人プロフィール 1.3% ダイレクトメッセージ 0.3%","headCounts":["285","9","1","0","1"],"audience":"年齢 18-24 11% 25-34 38% 35-44 34% 45-54 12% 55+ 5% / 女性 80% 男性 20% / タイ 83.2% 日本 6.5% ラオス 2.6% ミャンマー 1.3% マレーシア 1.0% 台湾 1.0%","likeAt":"0:02"}
+ ]}
