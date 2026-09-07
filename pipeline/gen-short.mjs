@@ -12,7 +12,7 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { renderAnimated } from "../../kamishibai/anim.mjs";
-import { loadEnv, cyrb53, bkkIso, thDate, dowOf, DAYS, PALETTES, STAGE, makePage } from "./lib/scene.mjs";
+import { loadEnv, cyrb53, bkkIso, thDate, dowOf, DAYS, PALETTES, MOTIFS, STAGE, makePage } from "./lib/scene.mjs";
 
 const ROOT = dirname(fileURLToPath(import.meta.url));
 loadEnv(ROOT);
@@ -20,7 +20,8 @@ const iso = bkkIso(process.argv[2]);
 const pick = (pool, salt) => pool[cyrb53(iso + "|short|" + salt) % pool.length];
 const day = DAYS[dowOf(iso)];
 const pal = pick(PALETTES, "pal");
-const page = makePage(pal);
+const motif = pick(MOTIFS, "motif");
+const page = makePage(pal, motif);
 
 // ---------- 台本プール (タイ語・AI生成・要ネイティブ校正) ----------
 const HOOKS = [

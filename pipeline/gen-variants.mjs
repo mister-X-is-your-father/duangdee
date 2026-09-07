@@ -11,7 +11,7 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { renderAnimated } from "../../kamishibai/anim.mjs";
-import { loadEnv, cyrb53, bkkIso, thDate, dowOf, DAYS, PALETTES, STAGE, makePage } from "./lib/scene.mjs";
+import { loadEnv, cyrb53, bkkIso, thDate, dowOf, DAYS, PALETTES, MOTIFS, STAGE, makePage } from "./lib/scene.mjs";
 
 const ROOT = dirname(fileURLToPath(import.meta.url));
 loadEnv(ROOT);
@@ -21,7 +21,8 @@ if (!TYPES.includes(type)) { console.error(`usage: node gen-variants.mjs <${TYPE
 const iso = bkkIso(process.argv[3]);
 const pick = (pool, salt) => pool[cyrb53(iso + "|" + type + "|" + salt) % pool.length];
 const pal = pick(PALETTES, "pal");
-const page = makePage(pal);
+const motif = pick(MOTIFS, "motif");
+const page = makePage(pal, motif);
 const day = DAYS[dowOf(iso)];
 
 // ---------- 素材 (タイ語・AI生成・要ネイティブ校正) ----------

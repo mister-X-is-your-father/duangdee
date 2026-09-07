@@ -48,10 +48,23 @@ export const DAYS = [
   { key: 6, name: "วันเสาร์", short: "เสาร์", power: "พลังความอึด", lucky: ["สีน้ำตาล", "#9c6b3f"], money: ["สีน้ำเงิน", "#2f6fd0"], avoid: ["สีเขียว", "#2e9e5b"] }
 ];
 
+// 背景パレット(中心→外周の3色)。2026-09-07 に 4→10 へ拡張(ユーザー「背景も色々変えたい」)。暖色・寒色・深緑・ワイン等
 export const PALETTES = [
   ["#2f2470", "#1a1440", "#0d0b26"], ["#1e3a5f", "#132a45", "#0a1626"],
-  ["#4a1f5e", "#2a1240", "#120a24"], ["#2b2b60", "#1a1a3f", "#0c0c22"]
+  ["#4a1f5e", "#2a1240", "#120a24"], ["#2b2b60", "#1a1a3f", "#0c0c22"],
+  ["#5a2a1a", "#331507", "#160903"], ["#1f4d3a", "#0f2e22", "#061710"],
+  ["#5c1f3a", "#331021", "#170710"], ["#3a3a1f", "#22220f", "#101006"],
+  ["#1f3f5c", "#0f2438", "#06121d"], ["#4a2f1a", "#2b1a0c", "#130b04"]
 ];
+// 背景の飾り(CSS だけ。seed で選ぶ)。none / stars(星屑) / bokeh(光の玉) / rings(同心円) / rays(放射)
+export const MOTIFS = ["none", "stars", "bokeh", "rings", "rays"];
+export const motifCss = (m) => ({
+  none: "",
+  stars: `body::before{content:"";position:absolute;inset:0;pointer-events:none;background-image:radial-gradient(circle,#fff9 1.5px,transparent 2px),radial-gradient(circle,#fff6 1px,transparent 1.6px),radial-gradient(circle,#f4c95d88 2px,transparent 2.6px);background-size:260px 340px,180px 220px,420px 520px;background-position:20px 40px,90px 160px,200px 80px;opacity:.55}`,
+  bokeh: `body::before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at 15% 20%,#f4c95d22 0 90px,transparent 120px),radial-gradient(circle at 85% 35%,#ffffff18 0 70px,transparent 100px),radial-gradient(circle at 25% 78%,#ffffff14 0 110px,transparent 150px),radial-gradient(circle at 80% 85%,#f4c95d1c 0 80px,transparent 110px)}`,
+  rings: `body::before{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-radial-gradient(circle at 50% 30%,#ffffff10 0 2px,transparent 2px 120px);opacity:.7}`,
+  rays: `body::before{content:"";position:absolute;inset:-40%;pointer-events:none;background:conic-gradient(from 0deg at 50% 32%,#ffffff0d 0 6deg,transparent 6deg 24deg);opacity:.8}`
+}[m] || "");
 
 // ---------- キャラ(SVG) + アイドル動作(__seek は周期関数 = anim.mjs の loop モード用) ----------
 export const CAT_SVG = `<svg id="cat" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
@@ -85,7 +98,8 @@ export const FONT = `<link href="https://fonts.googleapis.com/css2?family=Prompt
 export const STAGE = `<div class="stage"><div id="glow"></div>${CAT_SVG}</div>`;
 
 // パレット固定のページ関数を返す。page(catPx, bodyHtml, extraCss?)
-export const makePage = (pal) => (cat, body, extraCss = "") => `<!DOCTYPE html><html><head><meta charset="utf-8">${FONT}<style>
+export const makePage = (pal, motif = "none") => (cat, body, extraCss = "") => `<!DOCTYPE html><html><head><meta charset="utf-8">${FONT}<style>
+  ${motifCss(motif)}
   html,body{margin:0;width:1080px;height:1920px;overflow:hidden}
   body{font-family:'Prompt',sans-serif;color:#f5f2ff;text-align:center;position:relative;display:flex;flex-direction:column;align-items:center;
     background:radial-gradient(circle at 50% 28%, ${pal[0]} 0%, ${pal[1]} 45%, ${pal[2]} 100%)}

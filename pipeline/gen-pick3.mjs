@@ -12,7 +12,7 @@ import { mkdirSync, writeFileSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { renderAnimated } from "../../kamishibai/anim.mjs";
-import { STAGE, makePage } from "./lib/scene.mjs";   // 猫・ページ骨格は gen-short.mjs と共通 (lib/scene.mjs)
+import { STAGE, makePage, PALETTES as SCENE_PALETTES, MOTIFS } from "./lib/scene.mjs";   // 猫・ページ骨格は gen-short.mjs と共通 (lib/scene.mjs)
 
 const ROOT = dirname(fileURLToPath(import.meta.url));
 
@@ -76,10 +76,7 @@ const CLOSES = [
   { screen: "คุณเลือกลูกไหน? 🐾\nบอกแม่หน่อย", tts: "คุณเลือกลูกไหนนะ… บอกแม่หน่อย… สีมงคลตามวันเกิดของคุณ อยู่ที่ ดวงดี๊ดี ดอท เอ็มอี นะลูก" },
   { screen: "เลือกลูกไหน… 🐾\nแม่รออ่านอยู่", tts: "เลือกลูกไหน บอกแม่ในคอมเมนต์นะ… แม่รออ่านอยู่… สีมงคลเฉพาะคุณ ที่ ดวงดี๊ดี ดอท เอ็มอี" }
 ];
-const PALETTES = [
-  ["#2f2470", "#1a1440", "#0d0b26"], ["#1e3a5f", "#132a45", "#0a1626"],
-  ["#4a1f5e", "#2a1240", "#120a24"], ["#2b2b60", "#1a1a3f", "#0c0c22"]
-];
+const PALETTES = SCENE_PALETTES;   // 背景は lib/scene.mjs の10色を共用
 const ORDINAL = ["ลูกที่หนึ่ง", "ลูกที่สอง", "ลูกที่สาม"];
 
 // 今日の3テーマ: 決定論的シャッフルの先頭3つ(重複なし)
@@ -87,7 +84,8 @@ const themes = THEMES.map((t, i) => ({ t, k: cyrb53(iso + "#t" + i) })).sort((a,
 const hook = pick(HOOKS, "hook"), close = pick(CLOSES, "close"), pal = pick(PALETTES, "pal");
 
 // ---------- キャラ(SVG)・アイドル動作・ページ骨格は lib/scene.mjs に共通化 (2026-09-06) ----------
-const page = makePage(pal);
+const motif = pick(MOTIFS, "motif");
+const page = makePage(pal, motif);
 const stage = STAGE;
 
 // ---------- スライド ----------
