@@ -17,7 +17,7 @@ loadEnv(ROOT);
 const TYPES = ["find", "zoom", "quiz", "screenshot", "flash", "lucky", "stop", "wake", "choose5", "target", "elim", "face", "breath", "zoomin", "shell", "daystop"];   // wake は保留(ユーザー判断 2026-09-08)
 const type = TYPES.includes(process.argv[2]) ? process.argv[2] : "find";
 const TD = targetDate(TYPES.includes(process.argv[2]) ? process.argv[3] : process.argv[2]);
-const iso = TD.iso;   // ゲーム型は日付非依存だが、表紙チップは投稿枠に合わせる(朝=ดวงวันนี้ / 夜=ดวงพรุ่งนี้)
+const iso = TD.iso;   // ゲーム型は日付非依存(ユーザー決定 2026-09-08): 表紙に日付を出さない=使い回し可。iso は seed(出題の日替わり)と出力フォルダ名にだけ使う
 const seed = (salt) => cyrb53(iso + "|" + type + "|" + salt);
 const pick = (pool, salt) => pool[seed(salt) % pool.length];
 const rnd = (salt) => (seed(salt) % 10000) / 10000;
@@ -45,7 +45,7 @@ const ITEMS = [
 const CLUTTER = ["✨", "⭐", "🌙", "🍃", "💫", "🫧", "☁️", "🌿"];
 
 // ---------- 表紙(1フレーム目=サムネ) ----------
-const cover = (title, sub) => ({ html: page(420, `${STAGE}<div class="chip" style="--c:#f4c95d;margin-top:4px">${TD.label} · ${thDate(iso)}</div><h1 style="font-size:110px;margin-top:18px">${title}</h1><div class="sub" style="font-size:54px;color:#fff">${sub}</div>`), dur: 0.45, noFadeIn: true });
+const cover = (title, sub) => ({ html: page(420, `${STAGE}<div class="chip" style="--c:#f4c95d;margin-top:4px">เกมของแม่ 🐾 แม่หมอดีดี</div><h1 style="font-size:110px;margin-top:18px">${title}</h1><div class="sub" style="font-size:54px;color:#fff">${sub}</div>`), dur: 0.45, noFadeIn: true });
 
 let slides, caption, meta;
 
