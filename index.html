@@ -196,14 +196,14 @@
           </ol>
           <p class="rank-lead" id="rk1-lead">แค่อันดับ 2–3 ก็ปังขนาดนี้… แล้ว<b>อันดับ 1</b> ที่แม่หมอเห็นชัดที่สุดล่ะ? มันอยู่ตรงหน้าคุณแล้ว แค่ยังอ่านไม่ออก 🐾</p>
           <div id="lock-cta">
-            <button class="btn btn-gold" id="btn-pay">ขอแม่หมอเปิดเลขอันดับ 1 · ฿29 <s>฿59</s></button>
+            <button class="btn btn-gold" id="btn-pay">รับแพ็กสีมงคลเฉพาะคุณ · ฿29 <s>฿59</s><br><small>วอลเปเปอร์ 3 สี + คำทำนายส่วนตัว + เปิดเลขอันดับ 1</small></button>
             <button class="btn btn-ghost" id="btn-share">หรือแชร์ให้เพื่อน 1 คน = เปิดฟรี 💛</button>
           </div>
         </div>
 
         <div class="secret-item">
           <h2><span class="emoji">📱</span>วอลเปเปอร์เสริมดวงของคุณ</h2>
-          <div id="wp-locked" class="wp-teaser">🔒 เปิดเลขอันดับ 1 แล้วรับวอลเปเปอร์เสริมดวง 3 สีเฉพาะคุณไปเลย</div>
+          <div id="wp-locked" class="wp-teaser">🔒 ปลดล็อกแล้วรับวอลเปเปอร์เสริมดวง 3 สีเฉพาะคุณไปเลย</div>
           <canvas id="wp-canvas" class="hidden"></canvas>
           <button class="btn btn-day hidden" id="btn-wallpaper">ดาวน์โหลดวอลเปเปอร์ ⬇️</button>
         </div>
@@ -214,12 +214,14 @@
     <div id="modal" class="modal-bg hidden">
       <div class="modal-card">
         <button class="modal-close" id="modal-close" aria-label="ปิด">×</button>
-        <h3>🎉 ระบบชำระเงินกำลังเปิดเร็ว ๆ นี้!</h3>
-        <p>ฝากอีเมลหรือ LINE ID ไว้ แล้วรับ<b>ส่วนลด 50%</b> ทันทีที่เปิดตัว — แถมรอบนี้แม่หมอดีดีปลดล็อกให้ฟรีเลย 🐱</p>
+        <h3>🎁 แพ็กสีมงคลเฉพาะคุณ · ฿29</h3>
+        <p>วอลเปเปอร์ 3 สีตามวันเกิด (สีมงคล / สีเรียกเงิน / สีที่ควรเลี่ยง) + คำทำนายส่วนตัวจากแม่หมอ + เปิดเลขอันดับ 1 — ปลดล็อกถาวร ไม่ต้องแชร์</p>
+        <button class="btn btn-gold" id="modal-buy">ซื้อแพ็ก ฿29 (ชำระปลอดภัยผ่าน Lemon Squeezy)</button>
+        <p style="margin-top:14px">ซื้อแล้ว? ใส่<b>รหัส (License key)</b> จากอีเมลยืนยันการซื้อ</p>
         <div class="field">
-          <input id="modal-contact" type="text" placeholder="อีเมล หรือ LINE ID">
+          <input id="license-key" type="text" placeholder="XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX" autocomplete="off">
         </div>
-        <button class="btn btn-gold" id="modal-send">รับส่วนลด + ปลดล็อกฟรี</button>
+        <button class="btn btn-ghost" id="license-send">ปลดล็อกด้วยรหัส</button>
       </div>
     </div>
 

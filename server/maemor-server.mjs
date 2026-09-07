@@ -18,6 +18,25 @@ const ALLOWED_ORIGINS = [
   "http://127.0.0.1:8944", "http://localhost:8944", "http://leo:8944"
 ];
 
+// ---- Lemon Squeezy ライセンス検証 (2026-09-07) ----
+// サイトの有料解除: 購入者がメール/レシートで受け取るライセンスキーを入力 → ここで LS License API に照会 → 商品IDが一致すれば valid
+const LS_PRODUCT_ID = Number(process.env.LS_PRODUCT_ID || 1344870);   // 「แพ็กสีมงคลเฉพาะคุณ」
+const licHits = new Map();   // ip -> [timestamps] (10分に20回まで)
+function licAllow(ip) {
+  const now = Date.now(); const arr = (licHits.get(ip) || []).filter((t) => now - t < 600000);
+  if (arr.length >= 20) return false; arr.push(now); licHits.set(ip, arr); return true;
+}
+async function validateLicense(key) {
+  const r = await fetch("https://api.lemonsqueezy.com/v1/licenses/validate", {
+    method: "POST", headers: { accept: "application/json", "content-type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({ license_key: key })
+  });
+  const j = await r.json().catch(() => ({}));
+  const status = j.license_key?.status || null;
+  const ok = !!j.valid && ["active", "inactive"].includes(status) && (!LS_PRODUCT_ID || Number(j.meta?.product_id) === LS_PRODUCT_ID);
+  return { valid: ok, status, product_id: j.meta?.product_id ?? null, error: ok ? null : (j.error || "invalid") };
+}
+
 // レート制限 (in-memory / 日次リセット)
 const LIMIT_PER_IP = 6, LIMIT_GLOBAL = 300;
 let day = "", perIp = new Map(), global_ = 0;
@@ -135,6 +154,25 @@ createServer(async (req, res) => {
   res.setHeader("Access-Control-Allow-Headers", "content-type");
   if (req.method === "OPTIONS") { res.writeHead(204); return res.end(); }
   if (req.method === "GET" && req.url === "/healthz") { res.writeHead(200); return res.end("ok"); }
+  if (req.method === "POST" && req.url === "/license/validate") {
+    const ip0 = req.headers["x-forwarded-for"]?.split(",")[0]?.trim() || req.socket.remoteAddress || "?";
+    if (!licAllow(ip0)) { res.writeHead(429, { "content-type": "application/json" }); return res.end(JSON.stringify({ valid: false, error: "too_many" })); }
+    let raw = "";
+    req.on("data", (c) => { raw += c; if (raw.length > 2048) req.destroy(); });
+    req.on("end", async () => {
+      try {
+        const key = String(JSON.parse(raw || "{}").license_key || "").trim().slice(0, 64);
+        if (!/^[A-Za-z0-9-]{16,64}$/.test(key)) { res.writeHead(200, { "content-type": "application/json" }); return res.end(JSON.stringify({ valid: false, error: "format" })); }
+        const v = await validateLicense(key);
+        console.log(`[license] ${v.valid ? "ok" : "ng"} status=${v.status} product=${v.product_id} ip=${ip0}`);
+        res.writeHead(200, { "content-type": "application/json" }); res.end(JSON.stringify(v));
+      } catch (e) {
+        console.error("[license] error:", e.message);
+        res.writeHead(500, { "content-type": "application/json" }); res.end(JSON.stringify({ valid: false, error: "server" }));
+      }
+    });
+    return;
+  }
   if (req.method !== "POST" || req.url !== "/reading") { res.writeHead(404); return res.end(); }
 
   const ip = req.headers["x-forwarded-for"]?.split(",")[0]?.trim() || req.socket.remoteAddress || "?";

@@ -6,3 +6,4 @@ server/.env
 pipeline/.env.local
 server/.cf-token
 pipeline/.tts-cache/
+tmp/

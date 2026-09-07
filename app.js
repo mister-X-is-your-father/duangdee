@@ -70,7 +70,9 @@ function computeReading(name, d, m, yearInput) {
 let READING = null;
 const $ = (id) => document.getElementById(id);
 const unlockKey = () => "dd_unlock_" + todayKey();
-const isUnlocked = () => { try { return localStorage.getItem(unlockKey()) === "1"; } catch (e) { return false; } };
+// 有料解除(ライセンスキー)は永続、無料解除(シェア)は当日のみ
+const hasLicense = () => { try { return !!localStorage.getItem("dd_license"); } catch (e) { return false; } };
+const isUnlocked = () => { try { return hasLicense() || localStorage.getItem(unlockKey()) === "1"; } catch (e) { return false; } };
 function setUnlocked() { try { localStorage.setItem(unlockKey(), "1"); } catch (e) { } }
 
 function init() {
@@ -82,7 +84,8 @@ function init() {
   $("btn-pay").addEventListener("click", onPayClick);
   $("btn-share").addEventListener("click", onShareClick);
   $("modal-close").addEventListener("click", () => $("modal").classList.add("hidden"));
-  $("modal-send").addEventListener("click", onWaitlistSend);
+  $("modal-buy").addEventListener("click", onBuyClick);
+  $("license-send").addEventListener("click", onLicenseSend);
   $("btn-wallpaper").addEventListener("click", onWallpaperDl);
   $("m-go").addEventListener("click", onMaemorClick);
   $("m-voice").addEventListener("click", onMaemorVoice);
@@ -236,18 +239,38 @@ function onMaemorVoice() {
   track("maemor_voice", "");
 }
 
+// ---- 有料解除: Lemon Squeezy チェックアウト + ライセンスキー (2026-09-07) ----
+// 売り物は「デジタル商品」(วอลเปเปอร์3色 + คำทำนาย PDF)。番号(เลขนำโชค)を売らない = 決済規約(ギャンブル隣接)の回避
+const LS_CHECKOUT = "https://duangdeedee.lemonsqueezy.com/checkout/buy/c574f962-0c64-45aa-a457-327404eeb88c";
+const LICENSE_API = "https://leo.tail65add4.ts.net:10000/license/validate";
+
 function onPayClick() {
   track("unlock_click", "price_thb29");
   $("modal").classList.remove("hidden");
 }
-
-function onWaitlistSend() {
-  const c = $("modal-contact").value.trim();
-  if (!c) { toast("กรอกอีเมลหรือ LINE ID ก่อนนะ"); return; }
-  track("email_submit", "discount50", c);
-  $("modal").classList.add("hidden");
-  setUnlocked(); revealSecret();
-  toast("ขอบคุณค่ะ 🎁 ปลดล็อกให้ฟรีรอบนี้เลย!");
+function onBuyClick() {
+  track("checkout_open", "lemonsqueezy");
+  window.open(LS_CHECKOUT + "?checkout[custom][ref]=site", "_blank", "noopener");
+}
+async function onLicenseSend() {
+  const key = $("license-key").value.trim();
+  if (!/^[A-Za-z0-9-]{16,64}$/.test(key)) { toast("ใส่รหัสจากอีเมลยืนยันการซื้อนะ (รูปแบบ XXXX-XXXX-…)"); return; }
+  const btn = $("license-send"); btn.disabled = true; btn.textContent = "กำลังตรวจสอบ…";
+  try {
+    const res = await fetch(LICENSE_API, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ license_key: key }) });
+    const j = await res.json();
+    if (j.valid) {
+      try { localStorage.setItem("dd_license", key); } catch (e) { }
+      track("license_ok", j.status || "");
+      $("modal").classList.add("hidden");
+      setUnlocked(); revealSecret();
+      toast("ขอบคุณนะลูก 💛 ปลดล็อกถาวรให้แล้ว");
+    } else {
+      track("license_ng", j.error || "");
+      toast(j.error === "too_many" ? "ลองใหม่อีกสักครู่นะ" : "รหัสไม่ถูกต้อง ลองเช็กอีเมลอีกทีนะ");
+    }
+  } catch (e) { toast("ตรวจสอบไม่ได้ตอนนี้ ลองใหม่อีกครั้งนะ"); }
+  btn.disabled = false; btn.textContent = "ปลดล็อกด้วยรหัส";
 }
 
 async function onShareClick() {
