@@ -12,7 +12,7 @@ import { mkdirSync, writeFileSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { renderAnimated } from "../../kamishibai/anim.mjs";
-import { STAGE, makePage, PALETTES as SCENE_PALETTES, MOTIFS } from "./lib/scene.mjs";   // 猫・ページ骨格は gen-short.mjs と共通 (lib/scene.mjs)
+import { STAGE, makePage, PALETTES as SCENE_PALETTES, MOTIFS, targetDate } from "./lib/scene.mjs";   // 猫・ページ骨格は gen-short.mjs と共通 (lib/scene.mjs)
 
 const ROOT = dirname(fileURLToPath(import.meta.url));
 
@@ -37,10 +37,10 @@ function cyrb53(str, seed = 0) {
 }
 
 const dateArg = process.argv[2];
-// バンコクの「壁時計の日付」を使う(toISOString は UTC に戻すため深夜〜朝7時は前日になるバグの回避)
-const bkkNow = new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Bangkok" }));
+// 投稿枠: 夜(タイ19時)投稿は「明日の占い」= 日付を翌日にし表紙を ดวงพรุ่งนี้ に。POST_SLOT=morning|evening で明示可(lib/scene.mjs targetDate)
+const TD = targetDate(dateArg);
+const iso = TD.iso;
 const pad2 = (n) => String(n).padStart(2, "0");
-const iso = dateArg || `${bkkNow.getFullYear()}-${pad2(bkkNow.getMonth() + 1)}-${pad2(bkkNow.getDate())}`;
 const pick = (pool, salt) => pool[cyrb53(iso + "|" + salt) % pool.length];
 
 // ---------- 台本プール (タイ語・AI生成・要ネイティブ校正) ----------
@@ -53,7 +53,7 @@ const HOOKS = [
   { screen: "ใจดีจนคนอื่นลืม 😼\nว่าลูกก็เหนื่อยเป็น", tts: "ใจดีจนคนอื่นลืมไปแล้ว ว่าลูกก็เหนื่อยเป็น… มานี่ แม่พูดแทนให้" },
   { screen: "ทนมาพอแล้วลูก 😼\nวันนี้แม่พูดเอง", tts: "ทนมาพอแล้วนะลูก… วันนี้แม่จะพูดสิ่งที่ลูกไม่กล้าพูดให้เอง" }
 ];
-const CHOOSE = { screen: "เลือก 1 ลูก 🔮\nที่ใจเรียก… แตะค้างไว้", tts: "เลือกลูกแก้ว 1 ลูก ที่ใจเรียก… อย่าเปลี่ยนใจนะ" };
+const CHOOSE = { screen: "เลือก 1 ลูก 🔮\nที่ใจเรียก… แตะค้างไว้", tts: "เลือก 1 ลูก ที่ใจเรียก… อย่าเปลี่ยนใจนะ" };
 // 各テーマ: sting=代弁(痛快・速め) / insight=見抜き+腑に落ちる例え(日常の物) / push=背中押し(温かく・ゆっくり)
 const THEMES = [
   // 実測(初回レンダ 91秒!): 温かい文が 17〜19秒/枚 → 各文を短く(刺し≤40字・例え≤45字・押し≤40字)。目標 総尺 45秒前後
@@ -102,11 +102,11 @@ const THEMES = [
 ];
 const CLOSES = [
   // クローズは短く(完了率優先)。URLは画面に出すので読みは軽く
-  { screen: "คุณเลือกลูกไหน? 🐾\nบอกแม่หน่อย", tts: "เลือกลูกไหน บอกแม่หน่อย… สีมงคลเฉพาะคุณ ที่ ดวงดี๊ดี ดอท เอ็มอี" },
-  { screen: "โดนไหม? 😼\nบอกแม่ว่าเลือกลูกไหน", tts: "โดนไหมลูก… เลือกลูกไหนบอกแม่… สีมงคลเฉพาะคุณ ที่ ดวงดี๊ดี ดอท เอ็มอี" }
+  { screen: "คุณเลือกลูกไหน? 🐾\nบอกแม่หน่อย", tts: "เลือกลูกไหน… บอกแม่หน่อยนะ" },
+  { screen: "โดนไหม? 😼\nบอกแม่ว่าเลือกลูกไหน", tts: "โดนไหมลูก… เลือกลูกไหน บอกแม่หน่อย" }
 ];
 // 話速(botnoi speed): 刺す文は速く・畳みかける、抱く文はゆっくり。同一テンポ=AI感の主因なので文ごとに変える
-const SPEED = { sting: Number(process.env.PICK3_SPEED_STING || 1.15), warm: Number(process.env.PICK3_SPEED_WARM || 1.0) };
+const SPEED = { sting: Number(process.env.PICK3_SPEED_STING || 1.15), warm: Number(process.env.PICK3_SPEED_WARM || 1.05) };
 const PALETTES = SCENE_PALETTES;   // 背景は lib/scene.mjs の10色を共用
 const ORDINAL = ["ลูกที่หนึ่ง", "ลูกที่สอง", "ลูกที่สาม"];
 
@@ -128,7 +128,7 @@ const slides = [
     const head = `${stage}<h1 style="font-size:64px">ลูกที่ ${i + 1} · <span class="gold">${th.key}</span></h1><div class="big" data-pulse style="--c:${th.hex}"></div><div class="chip" style="--c:${th.hex}">${th.color}</div>`;
     return [
       // A: 代弁で刺す(痛快)。速め。画面は刺し文だけ大きく
-      { html: page(420, `${head}<div class="msg">😼 ${L.sting}</div>`), tts: `ถ้าเลือก${ORDINAL[i]}… ${L.sting}`, botnoiSpeed: SPEED.sting },
+      { html: page(420, `${head}<div class="msg">😼 ${L.sting}</div>`), tts: `${ORDINAL[i]}… ${L.sting}`, botnoiSpeed: SPEED.sting },
       // B: 例えで腑に落とす → 背中を押す。ゆっくり温かく。刺しから3秒以内に回収する規約
       { html: page(420, `${head}<div class="msg">${L.insight}</div><div class="act">🐾 ${L.push}</div>`), tts: `${L.insight}… ${L.push}`, botnoiSpeed: SPEED.warm }
     ];
@@ -140,7 +140,7 @@ const slides = [
 // プロフィール一覧・検索・フォロー中タブで効く。引き文句「เลือก 1 ใน 3」+日付+3つの玉+猫、パレットは日替わり
 const TH_MONTHS = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
 const [, cm, cd] = iso.split("-").map(Number);
-const coverHtml = page(460, `${stage}<div class="chip" style="--c:#f4c95d;margin-top:4px">ดวงวันนี้ · ${cd} ${TH_MONTHS[cm - 1]}</div><h1 style="font-size:124px;margin-top:18px">เลือก <span class="gold">1 ใน 3</span> 🔮</h1><div class="sub" style="font-size:56px;color:#fff">วันนี้แม่พูดแทนลูกเอง 😼<br>แรงหน่อย แต่รักนะ</div><div class="orbs" style="margin-top:40px"><div class="orb">1</div><div class="orb">2</div><div class="orb">3</div></div>`);
+const coverHtml = page(460, `${stage}<div class="chip" style="--c:#f4c95d;margin-top:4px">${TD.label} · ${cd} ${TH_MONTHS[cm - 1]}</div><h1 style="font-size:124px;margin-top:18px">เลือก <span class="gold">1 ใน 3</span> 🔮</h1><div class="sub" style="font-size:56px;color:#fff">วันนี้แม่พูดแทนลูกเอง 😼<br>แรงหน่อย แต่รักนะ</div><div class="orbs" style="margin-top:40px"><div class="orb">1</div><div class="orb">2</div><div class="orb">3</div></div>`);
 const coverSlide = { html: coverHtml, dur: 0.45, noFadeIn: true };
 if (!process.env.PICK3_NO_COVER) slides.unshift(coverSlide);
 
@@ -156,7 +156,7 @@ if (process.env.PICK3_DRY) {   // 生成せず文字数だけ(Botnoi の point �
   process.exit(0);
 }
 mkdirSync(outDir, { recursive: true });
-console.log(`[pick3] ${iso} — テーマ: ${themes.map((t) => t.key).join(" / ")} | hook#${HOOKS.indexOf(hook)} pal#${PALETTES.indexOf(pal)} | tts=${engineEff} ${ttsChars}字`);
+console.log(`[pick3] ${iso} (${TD.slot}) — テーマ: ${themes.map((t) => t.key).join(" / ")} | hook#${HOOKS.indexOf(hook)} pal#${PALETTES.indexOf(pal)} | tts=${engineEff} ${ttsChars}字`);
 const coverOnly = !!process.env.PICK3_COVER_ONLY;   // PICK3_COVER_ONLY=1: 表紙カットだけ cover.mp4 に描画(既存動画へ後付けする用、TTS消費ゼロ)
 const outMp4 = process.env.PICK3_CAPTION_ONLY ? join(outDir, "pick3.mp4") : await renderAnimated({   // PICK3_CAPTION_ONLY=1: 動画は作らず caption/meta だけ更新
   out: join(outDir, coverOnly ? "cover.mp4" : "pick3.mp4"), size: [1080, 1920], fps: 30, padSec: 0.35, fade: 0.25,

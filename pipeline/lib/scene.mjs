@@ -32,6 +32,20 @@ export function bkkIso(dateArg) {
   const p = (n) => String(n).padStart(2, "0");
   return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
 }
+// 投稿枠: 夜(タイ19時)に出す動画は「明日の占い」。POST_SLOT=morning|evening で明示、未指定はバンコク時刻 14時以降を evening とみなす
+//  targetDate(dateArg) → { iso, label } : dateArg 明示ならその日、無ければ evening=明日 / morning=今日。label は表紙チップ用
+export function postSlot() {
+  const env = (process.env.POST_SLOT || "").toLowerCase();
+  if (env === "morning" || env === "evening") return env;
+  const h = new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Bangkok" })).getHours();
+  return h >= 14 ? "evening" : "morning";
+}
+export function targetDate(dateArg) {
+  const slot = postSlot();
+  let iso = bkkIso(dateArg);
+  if (!dateArg && slot === "evening") { const d = new Date(iso + "T12:00:00+07:00"); d.setUTCDate(d.getUTCDate() + 1); iso = d.toISOString().slice(0, 10); }
+  return { iso, slot, label: slot === "evening" ? "ดวงพรุ่งนี้" : "ดวงวันนี้" };
+}
 export const TH_MONTHS = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
 export const thDate = (iso) => { const [, m, d] = iso.split("-").map(Number); return `${d} ${TH_MONTHS[m - 1]}`; };
 export const dowOf = (iso) => new Date(iso + "T12:00:00+07:00").getDay();   // 0=日 … 6=土

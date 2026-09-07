@@ -10,13 +10,14 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { renderAnimated } from "../../kamishibai/anim.mjs";
-import { loadEnv, cyrb53, bkkIso, thDate, dowOf, DAYS, PALETTES, MOTIFS, STAGE, makePage } from "./lib/scene.mjs";
+import { loadEnv, cyrb53, bkkIso, thDate, dowOf, DAYS, PALETTES, MOTIFS, STAGE, makePage, targetDate } from "./lib/scene.mjs";
 
 const ROOT = dirname(fileURLToPath(import.meta.url));
 loadEnv(ROOT);
 const TYPES = ["find", "zoom", "quiz", "screenshot", "flash", "lucky"];
 const type = TYPES.includes(process.argv[2]) ? process.argv[2] : "find";
-const iso = bkkIso(TYPES.includes(process.argv[2]) ? process.argv[3] : process.argv[2]);
+const TD = targetDate(TYPES.includes(process.argv[2]) ? process.argv[3] : process.argv[2]);
+const iso = TD.iso;   // ゲーム型は日付非依存だが、表紙チップは投稿枠に合わせる(朝=ดวงวันนี้ / 夜=ดวงพรุ่งนี้)
 const seed = (salt) => cyrb53(iso + "|" + type + "|" + salt);
 const pick = (pool, salt) => pool[seed(salt) % pool.length];
 const rnd = (salt) => (seed(salt) % 10000) / 10000;
@@ -44,7 +45,7 @@ const ITEMS = [
 const CLUTTER = ["✨", "⭐", "🌙", "🍃", "💫", "🫧", "☁️", "🌿"];
 
 // ---------- 表紙(1フレーム目=サムネ) ----------
-const cover = (title, sub) => ({ html: page(420, `${STAGE}<div class="chip" style="--c:#f4c95d;margin-top:4px">ดวงวันนี้ · ${thDate(iso)}</div><h1 style="font-size:110px;margin-top:18px">${title}</h1><div class="sub" style="font-size:54px;color:#fff">${sub}</div>`), dur: 0.45, noFadeIn: true });
+const cover = (title, sub) => ({ html: page(420, `${STAGE}<div class="chip" style="--c:#f4c95d;margin-top:4px">${TD.label} · ${thDate(iso)}</div><h1 style="font-size:110px;margin-top:18px">${title}</h1><div class="sub" style="font-size:54px;color:#fff">${sub}</div>`), dur: 0.45, noFadeIn: true });
 
 let slides, caption, meta;
 
