@@ -14,7 +14,7 @@ import { loadEnv, cyrb53, bkkIso, thDate, dowOf, DAYS, PALETTES, MOTIFS, STAGE, 
 
 const ROOT = dirname(fileURLToPath(import.meta.url));
 loadEnv(ROOT);
-const TYPES = ["find", "zoom", "quiz"];
+const TYPES = ["find", "zoom", "quiz", "screenshot", "flash", "lucky"];
 const type = TYPES.includes(process.argv[2]) ? process.argv[2] : "find";
 const iso = bkkIso(TYPES.includes(process.argv[2]) ? process.argv[3] : process.argv[2]);
 const seed = (salt) => cyrb53(iso + "|" + type + "|" + salt);
@@ -111,11 +111,13 @@ if (type === "zoom") {
   const zoomAnim = ANIM(`${ease}var s=16-15*e;document.querySelector('.zoomwrap .stage').style.transform='scale('+s.toFixed(3)+')';document.getElementById('cd').textContent=Math.max(0,Math.ceil(8*(1-t)));`);
   slides = [
     cover("ทายสิ นี่คืออะไร 👀", "ส่วนไหนของแม่หมอดีดี?"),
-    { html: page(1, `<h1 style="font-size:78px;margin-top:70px">ทายสิ… นี่คืออะไร 👀</h1><div class="sub" style="font-size:40px">ส่วนไหนของแม่ · ทายถูกตอนกี่วิ?</div><div id="cd">8</div><div class="zoomwrap">${STAGE}</div><div class="qmark">❓</div>${zoomAnim}`, zoomCss), tts: "ทายสิ… นี่คือส่วนไหนของแม่… ใครทายถูกก่อน แม่ให้ดาว", seek: true, animSec: 8, dur: 9, hold: 0, botnoiSpeed: SPEED.fast },
+    // フック: 16倍のまま静止(何か分からない絵)で問いかけ
+    { html: page(1, `<h1 style="font-size:78px;margin-top:70px">ทายสิ… นี่คืออะไร 👀</h1><div class="sub" style="font-size:40px">ส่วนไหนของแม่ · ทายถูกตอนกี่วิ?</div><div class="zoomwrap">${STAGE}</div><div class="qmark">❓</div>${ANIM("document.querySelector('.zoomwrap .stage').style.transform='scale(16)';")}`, zoomCss), tts: "ทายสิ… นี่คือส่วนไหนของแม่… ใครทายถูกก่อน แม่ให้ดาว", seek: true, loop: 3, hold: 0.2, botnoiSpeed: SPEED.fast },
+    // 引き: 無音8秒。ease-in = 長く拡大のまま → 最後に一気に引く(答えは最後)
+    { html: page(1, `<h1 style="font-size:78px;margin-top:70px">ทายสิ… นี่คืออะไร 👀</h1><div class="sub" style="font-size:40px">เห็นแล้วพิมพ์เลย · ก่อนเฉลย</div><div id="cd">8</div><div class="zoomwrap">${STAGE}</div>${ANIM("var e=Math.pow(t,2.4);var s=16-15*e;document.querySelector('.zoomwrap .stage').style.transform='scale('+s.toFixed(3)+')';document.getElementById('cd').textContent=Math.max(0,Math.ceil(8*(1-t)));")}`, zoomCss), dur: 8, seek: true, animSec: 8 },
     { html: page(560, `${STAGE}<h1 style="font-size:84px">${part.th}</h1><div class="msg">${part.line}</div><div class="act">🐾 ของนำโชควันนี้: ${part.lucky}</div>`), tts: `เฉลย… ${part.th.replace(/[^฀-๿\s]/g, "").trim()}… ${part.line}… ของนำโชคของลูกวันนี้ คือ ${part.lucky}`, seek: true, loop: 3, hold: 0.4, botnoiSpeed: SPEED.warm },
     { html: page(520, `${STAGE}<h1>ทายถูกตอนกี่วิ? 😼\nบอกแม่หน่อย</h1><div class="sub">พรุ่งนี้แม่ซ่อนส่วนใหม่ 🐾<br><span class="gold">duangdeedee.me</span></div>`), tts: "ทายถูกตอนกี่วิ บอกแม่หน่อย… พรุ่งนี้แม่ซ่อนส่วนใหม่นะ", seek: true, loop: 3, hold: 0.3 }
   ];
-  // zoom スライドは TTS 付きだが尺は動きの 8 秒に合わせたい → tts があると dur は音声長+hold になる仕様。音声が短ければ animSec で動きが前倒し
   caption = `ทายสิ… นี่คือส่วนไหนของแม่หมอดีดี 👀 ทายถูกตอนกี่วิ? บอกแม่ในคอมเมนต์ 🐾 เฉลยท้ายคลิป + ของนำโชคของลูกวันนี้ · duangdeedee.me (พิมพ์ในเบราว์เซอร์ได้เลย)
 #สายมู #ดูดวง #แม่หมอดีดี #ทายสิ #เกมทายใจ`;
   meta = { part: part.key };
@@ -150,6 +152,78 @@ if (type === "quiz") {
   caption = `ทายสี 🎨 คน${day.name} ห้ามใส่สีอะไร? เฉลยท้ายคลิป ✨ ตอบถูกไหม? บอกแม่ในคอมเมนต์พร้อมวันเกิดของลูก 🐾 สีครบทุกวันเกิด → duangdeedee.me (พิมพ์ในเบราว์เซอร์ได้เลย)
 #สายมู #สีมงคล #แม่หมอดีดี #คนเกิดวัน${day.short} #เกมทายใจ`;
   meta = { day: day.name, answer: day.avoid[0], shown: shown.map((c) => c[0]) };
+}
+
+// =====================================================================
+if (type === "screenshot") {
+  // แคปหน้าจอ: 結果カードが 0.1 秒ごとに切り替わる → 「今スクショ!」→ 何が出たかコメント(TikTok 定番の参加型・巻き戻し誘発)
+  const CARDS = [
+    ["💰", "เงินเข้าแบบไม่คาดคิด"], ["💌", "คนเก่าทักมา"], ["🌈", "งานใหม่ที่ใช่"], ["🛏️", "ได้พักจริง ๆ สักที"],
+    ["🍀", "โชคดีทั้งสัปดาห์"], ["💘", "มีคนแอบชอบ"], ["✈️", "ได้ไปที่ที่อยากไป"], ["🧧", "ผู้ใหญ่เอ็นดู"],
+    ["🔑", "ปัญหาเก่าคลี่คลาย"], ["🌙", "นอนหลับสบายทุกคืน"], ["🎁", "ของขวัญจากคนไม่คาดคิด"], ["🐾", "แม่อยู่ข้างลูกทั้งเดือน"]
+  ];
+  const order = CARDS.map((c, i) => ({ c, k: seed("card" + i) })).sort((a, b) => a.k - b.k).map((x) => x.c);
+  const cardsHtml = order.map((c, i) => `<div class="card" data-i="${i}"><div class="ce">${c[0]}</div><div class="ct">${c[1]}</div></div>`).join("");
+  const css = `.deck{position:absolute;left:90px;right:90px;top:640px;height:760px}
+    .card{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;border-radius:48px;background:#ffffff14;border:4px solid #f4c95d88;box-shadow:0 0 60px #f4c95d33}
+    .card.on{display:flex}
+    .ce{font-size:220px;line-height:1;font-family:'Noto Color Emoji'} .ct{font-size:60px;font-weight:800;margin-top:40px;padding:0 40px;line-height:1.3}
+    .now{position:absolute;left:0;right:0;top:1460px;font-size:74px;font-weight:800;color:#f4c95d;animation:none}`;
+  const N = order.length, CYCLES = 7;   // 8秒で 7周 ≈ 0.095秒/枚
+  slides = [
+    cover("แคปหน้าจอ 📸", "แล้วดูว่าแม่ให้อะไรลูกเดือนนี้"),
+    { html: page(1, `<h1 style="font-size:78px;margin-top:70px">แคปหน้าจอตอนนี้ 📸</h1><div class="sub" style="font-size:40px">ได้อะไร = แม่ให้สิ่งนั้นเดือนนี้</div><div class="deck">${cardsHtml}</div><div class="now">พร้อม… แคป!</div>${ANIM(`var n=${N},cy=${CYCLES};var i=Math.floor(t*n*cy)%n;document.querySelectorAll('.card').forEach(function(c,k){c.classList.toggle('on',k===i);});`)}`, css), tts: "แคปหน้าจอตอนนี้… ได้อะไร แม่ให้สิ่งนั้นกับลูกทั้งเดือน… พร้อมนะ… แคป!", seek: true, animSec: 8, hold: 3.5, botnoiSpeed: SPEED.fast },
+    { html: page(520, `${STAGE}<h1>ได้อะไร? 😼\nบอกแม่หน่อย</h1><div class="sub">ไม่ทัน? ดูซ้ำได้ แม่ไม่ว่า 🐾<br><span class="gold">duangdeedee.me</span></div>`), tts: "ได้อะไร บอกแม่หน่อย… ไม่ทันก็ดูซ้ำได้นะ แม่ไม่ว่า", seek: true, loop: 3, hold: 0.3 }
+  ];
+  caption = `แคปหน้าจอตอนนี้ 📸 ได้อะไร = แม่ให้สิ่งนั้นกับลูกทั้งเดือน ได้อะไรบอกแม่ในคอมเมนต์ 🐾 ไม่ทันดูซ้ำได้ · duangdeedee.me (พิมพ์ในเบราว์เซอร์ได้เลย)
+#สายมู #ดูดวง #แม่หมอดีดี #แคปหน้าจอ #เกมทายใจ`;
+  meta = { cards: order.length };
+}
+
+// =====================================================================
+if (type === "flash") {
+  // 謎を提起 → 答えは 2 フレーム(≈0.07秒)だけ表示 → 「止められた?」(一時停止・巻き戻し = 視聴時間)
+  const day = DAYS[seed("day") % 7];
+  const RIDDLES = [
+    { q: `สีที่จะพาคน${day.name}\nเจอเงินสัปดาห์นี้คือ…`, a: day.money[0], hex: day.money[1] },
+    { q: `สีที่คน${day.name}\nควรเลี่ยงวันนี้คือ…`, a: day.avoid[0], hex: day.avoid[1] },
+    { q: `สีเสริมเสน่ห์ของคน${day.name}\nสัปดาห์นี้คือ…`, a: day.lucky[0], hex: day.lucky[1] }
+  ];
+  const r = pick(RIDDLES, "riddle");
+  const css = `.ans{position:absolute;left:0;right:0;top:600px;display:none;flex-direction:column;align-items:center}
+    .ans.on{display:flex} .ans .sw{width:420px;height:420px;border-radius:50%;box-shadow:0 0 120px #fff8} .ans .t{font-size:110px;font-weight:800;margin-top:30px}
+    .hint{position:absolute;left:0;right:0;top:1440px;font-size:46px;color:#f4c95d}`;
+  const FLASH_AT = 0.58, FLASH_LEN = 2 / (9 * 30);   // 9秒スライドの 58% 地点で 2 フレーム
+  slides = [
+    cover("จับให้ทัน ⚡", `คำตอบโผล่แค่ 1 กะพริบ`),
+    { html: page(420, `${STAGE}<h1 style="font-size:74px">${r.q}</h1><div class="hint">คำตอบโผล่แค่กะพริบเดียว… หยุดให้ทันนะ ⚡</div>`), tts: `${r.q.replace("\n", " ")}… แม่จะโชว์คำตอบแค่กะพริบเดียว… หยุดให้ทันนะลูก`, seek: true, loop: 3, hold: 0.2, botnoiSpeed: SPEED.fast },
+    { html: page(420, `${STAGE}<h1 style="font-size:74px">${r.q}</h1><div class="ans"><div class="sw" style="background:${r.hex}"></div><div class="t">${r.a}</div></div><div class="hint">👀 อย่ากะพริบตา</div>${ANIM(`var on=(t>=${FLASH_AT}&&t<${FLASH_AT}+${FLASH_LEN.toFixed(5)});document.querySelector('.ans').classList.toggle('on',on);document.getElementById('cat').style.opacity=on?0.15:1;`)}`, css), dur: 9, seek: true, animSec: 9 },
+    { html: page(520, `${STAGE}<h1>หยุดทันไหม? 😼\nบอกแม่ว่าสีอะไร</h1><div class="sub">ไม่ทัน? ดูซ้ำสิ แม่รอ 🐾<br><span class="gold">duangdeedee.me</span></div>`), tts: "หยุดทันไหมลูก… บอกแม่ว่าสีอะไร… ไม่ทันก็ดูซ้ำสิ แม่รอ", seek: true, loop: 3, hold: 0.3 }
+  ];
+  caption = `จับให้ทัน ⚡ ${r.q.replace("\n", " ")} คำตอบโผล่แค่กะพริบเดียว หยุดทันไหม? บอกแม่ในคอมเมนต์ 🐾 สีครบทุกวันเกิด → duangdeedee.me (พิมพ์ในเบราว์เซอร์ได้เลย)
+#สายมู #สีมงคล #แม่หมอดีดี #คนเกิดวัน${day.short} #จับให้ทัน`;
+  meta = { day: day.name, answer: r.a };
+}
+
+// =====================================================================
+if (type === "lucky") {
+  // 「このクリップが流れてきた人 = 運が開く」型。受け取りは「พิมพ์ รับ」= 1語コメント。保証はしない(娯楽・祝福の言い方)
+  const BLESS = [
+    { t: "ถ้าคลิปนี้โผล่มา\nแปลว่าดวงลูกกำลังเปิด ✨", l: "แม่ส่งคลิปนี้ให้เฉพาะคนที่ทนมานาน… เดือนนี้ถึงตาลูกได้รับบ้าง" },
+    { t: "คลิปนี้ไม่ได้มาบังเอิญ 🐾\nแม่ตั้งใจส่งมาให้ลูก", l: "ที่ลูกยังไม่ได้ ไม่ใช่ไม่คู่ควร… แค่ยังไม่ถึงคิว และคิวลูกใกล้แล้ว" },
+    { t: "ใครเห็นคลิปนี้ก่อนนอน 🌙\nแม่ให้โชคติดตัวไปเลย", l: "คืนนี้หลับให้สบาย… เรื่องที่กังวลอยู่ แม่ช่วยถือไว้ให้ก่อน" }
+  ];
+  const b = pick(BLESS, "bless");
+  const css = `.seal{position:absolute;left:0;right:0;top:1300px;display:flex;justify-content:center}
+    .seal div{width:260px;height:260px;border-radius:50%;border:10px solid #f4c95d;display:flex;align-items:center;justify-content:center;font-size:110px;box-shadow:0 0 80px #f4c95d66;transform:scale(0)}`;
+  slides = [
+    cover("ถ้าคลิปนี้โผล่มา ✨", "แปลว่าดวงลูกกำลังเปิด"),
+    { html: page(520, `${STAGE}<h1 style="font-size:78px">${b.t}</h1><div class="msg">${b.l}</div><div class="seal"><div id="seal">🐾</div></div>${ANIM("var e=Math.min(1,Math.max(0,(t-0.55)/0.25));var s=1.4*e-0.4*e*e;document.getElementById('seal').style.transform='scale('+Math.max(0,s).toFixed(3)+')';")}`, css), tts: `${b.t.replace("\n", " ")}… ${b.l}`, seek: true, animSec: 6, hold: 0.6, botnoiSpeed: SPEED.warm },
+    { html: page(520, `${STAGE}<h1>รับไว้นะลูก 💛\nพิมพ์ "รับ"</h1><div class="sub">ส่งต่อให้คนที่ลูกอยากให้ดวงเปิด 🐾<br><span class="gold">duangdeedee.me</span></div>`), tts: "รับไว้นะลูก… พิมพ์ว่า รับ… แล้วส่งต่อให้คนที่ลูกอยากให้ดวงเปิด", seek: true, loop: 3, hold: 0.3 }
+  ];
+  caption = `${b.t.replace("\n", " ")} 🐾 รับไว้พิมพ์ "รับ" แล้วส่งต่อให้คนที่อยากให้ดวงเปิด · เพื่อความบันเทิงและกำลังใจ · duangdeedee.me (พิมพ์ในเบราว์เซอร์ได้เลย)
+#สายมู #ดูดวง #แม่หมอดีดี #ดวงเปิด #รับโชค`;
+  meta = { bless: BLESS.indexOf(b) };
 }
 
 // ---------- 生成 ----------
