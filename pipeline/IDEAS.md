@@ -68,3 +68,11 @@
 - ゲーム型 `gen-game.mjs`：find（隠れた物5つ・10秒・最初に見つけた物=ラッキーアイテム・「いくつ見つけた?」）／zoom（猫の一部を超拡大→引き・ベクタで鮮明・「何秒で分かった?」）／quiz（曜日×避ける色の3択・5秒カウントダウン・「当たった?+誕生曜日」）
 - 図解型（次）：7曜日×3色の一覧表、曜日相性の輪、「今週の色カレンダー」。保存率狙い
 - 完走の構造：答え・正体・結果は必ず最後。画面の情報量を多めにして一時停止/巻き戻しを誘う（視聴時間）。数字は出さない
+
+## 2026-09-08 ユーザー決定：操作ゲーム型の採用リストと第1週ローテ
+採用（`gen-game.mjs`）：stop（矢印を止める）／find（物探し）／zoom（何これ）／quiz（3択）／screenshot／flash／lucky／choose5（左右5問）／target（的当て）／elim（先に1色選ぶ→消去法）／face（一瞬の顔）／breath（呼吸で止める）／zoomin（ズーム中に現れる猫をタップ）／shell（順番当て）／daystop（曜日カードを止める）
+保留：wake（連打で猫を起こす）＝「無理がある」でローテから除外。コードは残置
+朝枠（タイ07:00）第1週案：月 stop → 火 find → 水 quiz → 木 elim → 金 screenshot → 土 choose5 → 日 flash。第2週：target → face → shell → daystop → zoomin → breath → lucky。7本ごとに維持率・完走率・コメント率で残す型を決める
+夜枠（タイ19:00）：毒舌 pick3 を固定（`POST_SLOT=evening`＝翌日の占い）。フックの効きだけを毎日1手ずつ直す
+生成コマンド：`POST_SLOT=morning node gen-game.mjs <type> [YYYY-MM-DD]` → `out/<date>-<type>/<type>.mp4` + caption.txt
+Botnoi ポイント：2026-09-08 06:30 時点 約3,400pt（1本 ≈ 300〜800pt）。12,500pt=$5.99 の追加購入はユーザー判断
