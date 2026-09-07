@@ -128,9 +128,9 @@ const slides = [
     const head = `${stage}<h1 style="font-size:64px">ลูกที่ ${i + 1} · <span class="gold">${th.key}</span></h1><div class="big" data-pulse style="--c:${th.hex}"></div><div class="chip" style="--c:${th.hex}">${th.color}</div>`;
     return [
       // A: 代弁で刺す(痛快)。速め。画面は刺し文だけ大きく
-      { html: page(420, `${head}<div class="msg">😼 ${L.sting}</div>`), tts: `${ORDINAL[i]}… ${L.sting}`, botnoiSpeed: SPEED.sting },
+      { html: page(420, `${head}<div class="msg">😼 ${L.sting}</div>`), tts: [`${ORDINAL[i]}…`, L.sting], botnoiSpeed: SPEED.sting },   // 部品合成: 番号(定型)と刺し文を別キャッシュ
       // B: 例えで腑に落とす → 背中を押す。ゆっくり温かく。刺しから3秒以内に回収する規約
-      { html: page(420, `${head}<div class="msg">${L.insight}</div><div class="act">🐾 ${L.push}</div>`), tts: `${L.insight}… ${L.push}`, botnoiSpeed: SPEED.warm }
+      { html: page(420, `${head}<div class="msg">${L.insight}</div><div class="act">🐾 ${L.push}</div>`), tts: [L.insight, L.push], botnoiSpeed: SPEED.warm }   // 部品合成: 例え文と押し文を別キャッシュ
     ];
   }),
   { html: page(520, `${stage}<h1>${close.screen}</h1><div class="sub">${close.sub} · สีมงคลเฉพาะคุณ →<br><span class="gold">duangdeedee.me</span></div>`), tts: close.tts }
@@ -149,7 +149,7 @@ if (!process.env.PICK3_NO_COVER) slides.unshift(coverSlide);
 //  botnoi(タイ企業ネイティブ声) は $BOTNOI_API_KEY + $BOTNOI_SPEAKER(話者ID。候補: 32=น้าเกรซ warm / 50=ครูดีดี๊ slow・trust / 60=เหมียว)。V2声=2 point/文字
 const ttsEngine = process.env.TTS_ENGINE || undefined;
 const engineEff = ttsEngine || ((process.env.ELEVENLABS_API_KEY && process.env.ELEVENLABS_VOICE_ID) ? "elevenlabs" : "edge");
-const ttsChars = slides.reduce((a, s) => a + (s.tts || "").length, 0);
+const ttsChars = slides.reduce((a, s) => a + (Array.isArray(s.tts) ? s.tts.map((p) => (typeof p === "string" ? p : p.text)).join("").length : (s.tts || "").length), 0);
 const outDir = join(ROOT, "out", iso + "-pick3" + (process.env.PICK3_SUFFIX || ""));   // PICK3_SUFFIX=-botnoi 等で別フォルダに出し比較できる
 if (process.env.PICK3_DRY) {   // 生成せず文字数だけ(Botnoi の point 見積り用)
   console.log(`[pick3] DRY ${iso} engine=${engineEff} tts chars=${ttsChars} (botnoi V2 ≈ ${ttsChars * 2} point)`);
