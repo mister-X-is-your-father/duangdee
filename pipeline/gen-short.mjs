@@ -84,9 +84,9 @@ const outMp4 = process.env.SHORT_CAPTION_ONLY ? join(outDir, "short.mp4") : awai
   slides
 }, ROOT);
 
-const TAIL_TAGS = ["#fyp", "#สายมูต้องรู้", "#ดวงวันนี้", "#fypシ"];
+// ハッシュタグは5個まで(ユーザー指示 2026-09-07)
 const caption = `คนเกิด${day.name} ฟังแม่แป๊บ 🐾 สัปดาห์นี้ใส่${day.lucky[0]} เลี่ยง${day.avoid[0]}… ${cta.screen.split("\n").join(" ").replace(/🐾/g, "").trim()} 🔮 สีมงคลครบทุกวันเกิด → duangdeedee.me (พิมพ์ในเบราว์เซอร์ได้เลย)
-#คนเกิด${day.name} #สีมงคล #สายมู #ดูดวง #มูเตลู #แม่หมอดีดี ${pick(TAIL_TAGS, "tag")}`;
+#คนเกิด${day.name} #สีมงคล #สายมู #ดูดวง #แม่หมอดีดี`;
 writeFileSync(join(outDir, "caption.txt"), caption);
 writeFileSync(join(outDir, "meta.json"), JSON.stringify({ iso, format: "short", day: day.name, lucky: day.lucky[0], avoid: day.avoid[0], hook: hook.screen, heart, palette: pal, ttsChars }, null, 2));
 console.log(`[short] ✅ ${outMp4}`);

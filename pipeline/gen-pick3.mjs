@@ -143,9 +143,9 @@ const CTAS = [
   (th) => `แม่หมอดีดีมีของขวัญ 3 อย่าง ${th.join(" · ")} เลือกได้แค่ 1 นะลูก 🔮 เลือกแล้วบอกแม่ในคอมเมนต์ แม่รออ่านอยู่ 🐾`,
   (th) => `หยุดก่อน… เลือกลูกแก้วที่ใจเรียก 1 ลูก 🔮 (${th.join(" · ")}) แล้วดูว่าแม่เห็นอะไรในดวงคุณ บอกแม่หน่อยว่าเลือกลูกไหน 🐾`
 ];
-const TAIL_TAGS = ["#fyp", "#fypシ", "#สายมูต้องรู้", "#ดวงวันนี้"];
+const TAIL_TAGS = ["#เสริมดวง", "#ดวงวันนี้", "#fyp", "#ดวงรายวัน"];   // ハッシュタグは5個まで(ユーザー指示 2026-09-07): 固定4 + 日替わり1
 const caption = `${hook.screen.split("\n")[0].replace(/[🐾✨👀]/g, "").trim()} ${pick(CTAS, "cta")(themes.map((t) => t.key))} สีมงคลตามวันเกิดของคุณ → duangdeedee.me (พิมพ์ในเบราว์เซอร์ได้เลย)
-#สายมู #ดูดวง #เสริมดวง #ดวงรายวัน #มูเตลู #แม่หมอดีดี ${pick(TAIL_TAGS, "tag")}`;
+#สายมู #ดูดวง #มูเตลู #แม่หมอดีดี ${pick(TAIL_TAGS, "tag")}`;
 writeFileSync(join(outDir, "caption.txt"), caption);
 writeFileSync(join(outDir, "meta.json"), JSON.stringify({ iso, format: "pick3", themes: themes.map((t) => t.key), hook: hook.screen, palette: pal }, null, 2));
 console.log(`[pick3] ✅ ${outMp4}`);
