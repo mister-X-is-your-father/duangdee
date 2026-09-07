@@ -14,7 +14,7 @@ import { loadEnv, cyrb53, bkkIso, thDate, dowOf, DAYS, PALETTES, MOTIFS, STAGE, 
 
 const ROOT = dirname(fileURLToPath(import.meta.url));
 loadEnv(ROOT);
-const TYPES = ["find", "zoom", "quiz", "screenshot", "flash", "lucky"];
+const TYPES = ["find", "zoom", "quiz", "screenshot", "flash", "lucky", "stop", "wake"];
 const type = TYPES.includes(process.argv[2]) ? process.argv[2] : "find";
 const TD = targetDate(TYPES.includes(process.argv[2]) ? process.argv[3] : process.argv[2]);
 const iso = TD.iso;   // ゲーム型は日付非依存だが、表紙チップは投稿枠に合わせる(朝=ดวงวันนี้ / 夜=ดวงพรุ่งนี้)
@@ -225,6 +225,61 @@ if (type === "lucky") {
   caption = `${b.t.replace("\n", " ")} 🐾 รับไว้พิมพ์ "รับ" แล้วส่งต่อให้คนที่อยากให้ดวงเปิด · เพื่อความบันเทิงและกำลังใจ · duangdeedee.me (พิมพ์ในเบราว์เซอร์ได้เลย)
 #สายมู #ดูดวง #แม่หมอดีดี #ดวงเปิด #รับโชค`;
   meta = { bless: BLESS.indexOf(b) };
+}
+
+// =====================================================================
+if (type === "stop") {
+  // タイミングで止める: 矢印が7色ゾーンを往復(加速) → 1回タップ=一時停止 → 止まったコマがそのまま結果(各コマが自己完結)
+  const ZONES = [
+    ["สีเขียว", "#2e9e5b", "การเงิน", "เงินที่รอ กำลังหาทางเข้ามา"], ["สีชมพู", "#ff5d8f", "ความรัก", "มีคนคิดถึงลูกอยู่จริง ๆ"],
+    ["สีม่วง", "#9d4edd", "ความสงบ", "คืนนี้ได้นอนสบายสักที"], ["สีเหลือง", "#f5c518", "พลังใจ", "ลูกแกร่งกว่าที่คิดเยอะ"],
+    ["สีน้ำเงิน", "#2f6fd0", "โอกาส", "ประตูที่ปิดอยู่ กำลังจะเปิด"], ["สีส้ม", "#f77f00", "เสน่ห์", "วันนี้ใครเห็นก็อยากคุย"],
+    ["สีขาว", "#f2efe6", "โชค", "เรื่องเล็ก ๆ ที่ดี จะมาทั้งวัน"]
+  ];
+  const css = `.track{position:absolute;left:60px;right:60px;top:1040px;height:150px;display:flex;gap:10px}
+    .zone{flex:1;border-radius:22px;opacity:.55;transition:none} .zone.hit{opacity:1;box-shadow:0 0 50px #fff9;transform:scaleY(1.12)}
+    #arrow{position:absolute;top:960px;left:0;font-size:80px;line-height:1;transform:translateX(-50%)}
+    .res{position:absolute;left:0;right:0;top:1230px;text-align:center}
+    .res .n{font-size:88px;font-weight:800} .res .k{font-size:54px;color:#f4c95d;margin-top:8px} .res .l{font-family:'Sarabun';font-size:44px;margin-top:14px;padding:0 80px;line-height:1.5}`;
+  const zonesHtml = ZONES.map((z, i) => `<div class="zone" id="z${i}" style="background:${z[1]}"></div>`).join("");
+  const zonesJson = JSON.stringify(ZONES.map((z) => [z[0], z[2], z[3]]));
+  // 往復(ping-pong)。後半ほど速い。位置 p∈[0,1) → zone index。各コマで結果テキストも更新(=止めたコマが答え)
+  const anim = `var Z=${zonesJson};var W=1080-120;var sp=2.2+4.5*t;var ph=(t*sp*3.0)%2;var p=ph<1?ph:2-ph;var x=60+W*p;var i=Math.min(6,Math.floor(p*7));
+    document.getElementById('arrow').style.left=x.toFixed(1)+'px';for(var k=0;k<7;k++){document.getElementById('z'+k).classList.toggle('hit',k===i);}
+    document.getElementById('rn').textContent=Z[i][0];document.getElementById('rk').textContent=Z[i][1];document.getElementById('rl').textContent=Z[i][2];`;
+  slides = [
+    cover("แตะหยุดให้ทัน ✋", "ตรงไหนที่หยุด = สีของลูกวันนี้"),
+    { html: page(380, `${STAGE}<h1 style="font-size:74px">แตะหน้าจอ 1 ครั้ง ✋\nตอนที่ลูกศรอยู่บนสีที่ใจเรียก</h1><div class="sub" style="font-size:40px">หยุดตรงไหน = สีและเรื่องดีของลูกวันนี้</div><div id="arrow">🔻</div><div class="track">${zonesHtml}</div><div class="res"><div class="n" id="rn"></div><div class="k" id="rk"></div><div class="l" id="rl"></div></div>${ANIM("var Z=" + zonesJson + ";var i=Math.floor(t*7)%7;document.getElementById('arrow').style.left=(60+960*((i+0.5)/7)).toFixed(1)+'px';for(var k=0;k<7;k++){document.getElementById('z'+k).classList.toggle('hit',k===i);}")}`, css), tts: "แตะหน้าจอหนึ่งครั้ง ตอนที่ลูกศรอยู่บนสีที่ใจเรียก… หยุดตรงไหน คือสีและเรื่องดีของลูกวันนี้… พร้อมนะ", seek: true, loop: 3, hold: 0.2, botnoiSpeed: SPEED.fast },
+    { html: page(380, `${STAGE}<h1 style="font-size:74px">แตะหยุด… ตอนนี้! ✋</h1><div class="sub" style="font-size:40px">ช้าลงได้ แต่แม่จะเร่งขึ้นเรื่อย ๆ นะ</div><div id="arrow">🔻</div><div class="track">${zonesHtml}</div><div class="res"><div class="n" id="rn"></div><div class="k" id="rk"></div><div class="l" id="rl"></div></div>${ANIM(anim)}`, css), dur: 10, seek: true, animSec: 10 },
+    { html: page(520, `${STAGE}<h1>หยุดได้สีอะไร? 😼\nบอกแม่หน่อย</h1><div class="sub">แคปไว้แล้วส่งให้เพื่อนลองหยุด 🐾<br><span class="gold">duangdeedee.me</span></div>`), tts: "หยุดได้สีอะไร บอกแม่หน่อย… แคปไว้ แล้วส่งให้เพื่อนลองหยุดดูนะ", seek: true, loop: 3, hold: 0.3 }
+  ];
+  caption = `แตะหยุดให้ทัน ✋ ลูกศรวิ่งบน 7 สี แตะหน้าจอ 1 ครั้งตอนที่อยู่บนสีที่ใจเรียก หยุดตรงไหน = สีและเรื่องดีของลูกวันนี้ ได้สีอะไรบอกแม่ 🐾 duangdeedee.me (พิมพ์ในเบราว์เซอร์ได้เลย)
+#สายมู #ดูดวง #แม่หมอดีดี #แตะหยุด #เกมทายใจ`;
+  meta = { zones: 7 };
+}
+
+// =====================================================================
+if (type === "wake") {
+  // 連打: 眠る แม่ を「2回タップ連打」で起こす(2回タップ=いいね) → 最後に目を開けて一言(代弁→優しさ)
+  const LINES = [
+    { s: "ปลุกแม่ทำไมดึกป่านนี้… นอนไม่หลับอีกแล้วใช่ไหม", h: "ไม่เป็นไร แม่ตื่นแล้ว… วางเรื่องนั้นไว้กับแม่ แล้วไปนอนซะ ลูกทำดีพอแล้ววันนี้" },
+    { s: "ตบแม่รัวขนาดนี้… ใจลูกร้อนเรื่องอะไรอยู่", h: "แม่รู้… รอคำตอบจากใครสักคนใช่ไหม… คนที่ใช่ไม่ทำให้ลูกต้องปลุกใครตอนตีสองหรอกนะ" },
+    { s: "โอ๊ย ตื่นแล้ว ๆ… ลูกนี่ไม่ยอมแพ้จริง ๆ", h: "นั่นแหละจุดแข็งของลูก… คนที่ตบไม่หยุดจนแม่ตื่น คือคนที่จะทำเรื่องยากสำเร็จ แม่ให้พร" }
+  ];
+  const L = pick(LINES, "line");
+  const css = `#zz{position:absolute;left:0;right:0;top:1180px;font-size:110px;opacity:.8} .cnt{position:absolute;left:0;right:0;top:1360px;font-size:70px;font-weight:800;color:#f4c95d}`;
+  // 眠り: 目を閉じ続ける → t>0.85 で開く。"แตะไปแล้ว N ครั้ง" カウンタが進む(視聴者の連打と同期している錯覚)
+  const sleepAnim = `var eo=document.getElementById('eyesOpen'),ec=document.getElementById('eyesClosed');var awake=t>0.85;eo.style.display=awake?'block':'none';ec.style.display=awake?'none':'block';
+    document.getElementById('zz').style.opacity=awake?0:(0.5+0.5*Math.sin(t*40));document.getElementById('cnt').textContent=awake?'แม่ตื่นแล้ว!':('แตะไปแล้ว '+Math.floor(t*40)+' ครั้ง…');`;
+  slides = [
+    cover("ปลุกแม่ให้ตื่น 😴", "แตะสองครั้งรัว ๆ"),
+    { html: page(560, `${STAGE}<h1 style="font-size:78px">แม่หลับอยู่ 😴\nแตะสองครั้งรัว ๆ ปลุกแม่</h1><div class="sub" style="font-size:40px">ตื่นแล้วแม่จะบอกเรื่องหนึ่งกับลูก</div><div id="zz">💤</div><div class="cnt" id="cnt"></div>${ANIM(sleepAnim)}`, css), dur: 8, seek: true, animSec: 8 },
+    { html: page(560, `${STAGE}<h1 style="font-size:70px">😼 ${L.s}</h1><div class="msg">${L.h}</div>`), tts: `${L.s}… ${L.h}`, seek: true, loop: 3, hold: 0.4, botnoiSpeed: SPEED.warm },
+    { html: page(520, `${STAGE}<h1>ปลุกแม่ตื่นทันไหม? 😼\nบอกแม่ว่าตบไปกี่ที</h1><div class="sub">พรุ่งนี้แม่หลับใหม่ มาปลุกอีกนะ 🐾<br><span class="gold">duangdeedee.me</span></div>`), tts: "ปลุกแม่ทันไหมลูก… บอกแม่ว่าตบไปกี่ที… พรุ่งนี้แม่หลับใหม่ มาปลุกอีกนะ", seek: true, loop: 3, hold: 0.3 }
+  ];
+  caption = `แม่หลับอยู่ 😴 แตะสองครั้งรัว ๆ ปลุกแม่ ตื่นแล้วแม่จะบอกเรื่องหนึ่งกับลูก 😼 ตบไปกี่ทีบอกแม่ในคอมเมนต์ 🐾 duangdeedee.me (พิมพ์ในเบราว์เซอร์ได้เลย)
+#สายมู #ดูดวง #แม่หมอดีดี #ปลุกแม่ #เกมทายใจ`;
+  meta = { line: LINES.indexOf(L) };
 }
 
 // ---------- 生成 ----------
