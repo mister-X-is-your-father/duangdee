@@ -496,7 +496,7 @@ if (!process.env.GAME_INTRO) {
   if (slides[0]) slides[0].noFadeIn = true;   // 1フレーム目=サムネ。黒から始めない
   // 冒頭の一言(bang): 型ごとに「え!?」を作る挑発・指差し・命令。画面いっぱいに叩き込む
   const BANG = { find: "หาไม่เจอหรอก!", stop: "แตะ!", zoom: "นี่อะไร!?", quiz: "ตอบผิดแน่!", screenshot: "แคป!", flash: "1 กะพริบ!", lucky: "คุณนั่นแหละ!", choose5: "ซ้าย? ขวา?", target: "ตรงไหม!?", elim: "สีคุณจะรอดไหม!?", face: "อย่ากะพริบ!", breath: "หายใจ…", zoomin: "แม่อยู่ไหน!?", shell: "ตามทันไหม!?", daystop: "วันเกิดคุณ!", wake: "ปลุกแม่!" };
-  if (slides[0] && !process.env.GAME_NO_COLDOPEN) slides.unshift(coldOpen(slides[0], process.env.GAME_BANG ?? (BANG[type] || "")));
+  if (slides[0] && !process.env.GAME_NO_COLDOPEN) slides.unshift(coldOpen(slides[0], theme.noble ? "" : (process.env.GAME_BANG ?? (BANG[type] || "")), 0.9, !!theme.noble));   // noble: 叩き込み無し・柔らかい入り
 }
 // 締めカードに QR (サイト導線)。TTS は不変なのでキャッシュはそのまま
 if (slides.length) slides[slides.length - 1].html = withQR(slides[slides.length - 1].html);
@@ -511,6 +511,7 @@ console.log(`[game:${type}] ${iso} theme=${theme.name} pal#${PALETTES.indexOf(pa
 const out = await renderAnimated({
   out: join(outDir, `${type}.mp4`), size: [1080, 1920], fps: 30, padSec: 0.3, fade: 0.25,
   ttsEngine, botnoiSpeaker: process.env.BOTNOI_SPEAKER, ttsCache: join(ROOT, ".tts-cache"),
+  captions: process.env.DD_NO_CAPTIONS ? false : { font: "Prompt", size: 54, marginV: 520 },   // テロップ(無音視聴向け、声と同期。2026-09-08)
   voice: "th-TH-PremwadeeNeural", rate: "+2%", ttsTempo: 1.0,
   music: join(ROOT, "assets", process.env.GAME_NO_COLDOPEN ? "bgm-warm.mp3" : "bgm-warm-hit.mp3"), musicVol: 0.10,
   slides

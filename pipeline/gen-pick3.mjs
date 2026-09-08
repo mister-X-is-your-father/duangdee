@@ -125,7 +125,7 @@ const stage = STAGE;
 // ---------- スライド ----------
 const slides = [
   { html: page(560, `${stage}<h1>${hook.screen}</h1>`), tts: hook.tts, botnoiSpeed: SPEED.sting },   // フックも刺し=速め
-  { html: page(520, `${stage}<h1>${CHOOSE.screen}</h1><div class="orbs"><div class="orb" data-pulse>1</div><div class="orb" data-pulse>2</div><div class="orb" data-pulse>3</div></div>`), tts: CHOOSE.tts },
+  { html: page(520, `${stage}<h1>${CHOOSE.screen}</h1><div class="orbs"><div class="orb" data-pulse data-n="1">1</div><div class="orb" data-pulse data-n="2">2</div><div class="orb" data-pulse data-n="3">3</div></div>`), tts: CHOOSE.tts },
   ...themes.flatMap((th, i) => {
     const L = pick(th.lines, "m" + i);
     const head = `${stage}<h1 style="font-size:64px">ลูกที่ ${i + 1} · <span class="gold">${th.key}</span></h1><div class="big" data-pulse style="--c:${th.hex}"></div><div class="chip" style="--c:${th.hex}">${th.color}</div>`;
@@ -145,7 +145,7 @@ const TH_MONTHS = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.�
 const [, cm, cd] = iso.split("-").map(Number);
 const coverHtml = page(460, `${stage}<div class="chip" style="--c:#f4c95d;margin-top:4px">${TD.label} · ${cd} ${TH_MONTHS[cm - 1]}</div><h1 style="font-size:124px;margin-top:18px">เลือก <span class="gold">1 ใน 3</span> 🔮</h1><div class="sub" style="font-size:56px;color:#fff">วันนี้แม่พูดแทนลูกเอง 😼<br>แรงหน่อย แต่รักนะ</div><div class="orbs" style="margin-top:40px"><div class="orb">1</div><div class="orb">2</div><div class="orb">3</div></div>`);
 const coverSlide = { html: coverHtml, dur: 0.45, noFadeIn: true };
-if (process.env.PICK3_COVER) slides.unshift(coverSlide); else { slides[0].noFadeIn = true; if (!process.env.PICK3_NO_COLDOPEN) slides.unshift(coldOpen(slides[0], hook.bang || "")); }   // 2026-09-08: 表紙なし + 0.7秒のコールドオープン
+if (process.env.PICK3_COVER) slides.unshift(coverSlide); else { slides[0].noFadeIn = true; if (!process.env.PICK3_NO_COLDOPEN) slides.unshift(coldOpen(slides[0], theme.noble ? "" : (hook.bang || ""), 0.9, !!theme.noble)); }   // 2026-09-08: 表紙なし + 0.7秒のコールドオープン
 
 // ---------- 生成 ----------
 // TTS エンジン: $TTS_ENGINE = botnoi | elevenlabs | edge。未指定は anim.mjs の自動判定(ELEVENLABS鍵+声IDがあれば elevenlabs、無ければ edge)
@@ -165,6 +165,7 @@ const outMp4 = process.env.PICK3_CAPTION_ONLY ? join(outDir, "pick3.mp4") : awai
   out: join(outDir, coverOnly ? "cover.mp4" : "pick3.mp4"), size: [1080, 1920], fps: 30, padSec: 0.35, fade: 0.25,
   ttsEngine, botnoiSpeaker: process.env.BOTNOI_SPEAKER,
   ttsCache: join(ROOT, ".tts-cache"),                     // 同じ声×同じ文は再合成しない(再レンダ無料)。gitignore 済み
+  captions: process.env.DD_NO_CAPTIONS ? false : { font: "Prompt", size: 54, marginV: 520 },   // テロップ(無音視聴向け、声と同期。2026-09-08)
   voice: "th-TH-PremwadeeNeural", rate: "+2%",            // edge-tts 用
   ttsTempo: engineEff === "elevenlabs" ? 1.18 : 1.0,      // ElevenLabs v3 はタイ語がゆっくり(実測 edge比 +20%)→ピッチ不変で1.18倍速。botnoi/edge は素のまま
   music: coverOnly ? undefined : join(ROOT, "assets", process.env.PICK3_NO_COLDOPEN ? "bgm-warm.mp3" : "bgm-warm-hit.mp3"), musicVol: 0.10,
