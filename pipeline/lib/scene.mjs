@@ -140,18 +140,21 @@ const QR_SVG = (() => { try { return readFileSync(join(dirname(fileURLToPath(imp
 const CAT_STATIC = () => CAT_SVG.replace(/ id="/g, ' data-id="').replace('id="orbg"', 'id="orbg2"').replace('url(#orbg)', 'url(#orbg2)');   // id 重複回避(アイドル動作の対象にしない)
 export const QR_BLOCK = QR_SVG ? `<div class="qrbox"><div class="qrframe">${QR_SVG}<div class="qrcat">${CAT_STATIC()}</div></div><div>สแกนไปหาแม่ 🐾</div></div>` : "";
 export const withQR = (html) => QR_BLOCK ? html.replace('<div class="brand">', QR_BLOCK + '<div class="brand">') : html;
-// ---------- コールドオープン (2026-09-08 ユーザー「最初の1秒に命をかけているか」) ----------
-// 最初のスライドの HTML をそのまま使い、0.7秒だけ「入り」のアニメを一度きり再生する短いカットを前置する:
-//  白いフラッシュ(2〜4フレーム) → 舞台のパンチイン(1.25→1.0) → 見出しが拡大から弾んで着地(overshoot) → 猫の目が見開く。
-//  続くループ・スライドの t=0 と同じ姿勢で終わるので継ぎ目が見えない。音声は次スライドから(0.7秒は効果音+BGM)
-export const coldOpen = (slide, sec = 0.7) => {
-  const intro = `<div id="flash" style="position:absolute;inset:0;background:#fff;pointer-events:none;z-index:9"></div><script>document.addEventListener('DOMContentLoaded',function(){var base=window.__seek;window.__seek=function(t){base((t*${sec}/3)%1);
-    var e=1-Math.pow(1-t,3);var back=1+2.2*Math.pow(1-t,2)*Math.sin(t*Math.PI*2.2);
-    document.querySelectorAll('h1').forEach(function(el){el.style.transform='scale('+(t<0.55?(1.7-0.7*Math.min(1,t/0.55)*1.0):(0.98+0.02*Math.cos((t-0.55)/0.45*Math.PI)))+')';el.style.opacity=Math.min(1,t/0.25).toFixed(2);});
-    var st=document.querySelector('.stage'); if(st) st.style.transform='scale('+(1.28-0.28*e).toFixed(3)+')';
-    var f=document.getElementById('flash'); if(f) f.style.opacity=Math.max(0,0.85-t*4).toFixed(2);
-    var eo=document.getElementById('eyesOpen'); if(eo) eo.setAttribute('transform', (t>0.2&&t<0.75)?'translate(100 92) scale(1.45) translate(-100 -92)':'');
-    document.querySelectorAll('.sub,.chip,.act,.tag,.orbs,.big').forEach(function(el){el.style.opacity=Math.min(1,Math.max(0,(t-0.35)/0.4)).toFixed(2);});
+// ---------- コールドオープン (2026-09-08 ユーザー「最初の1秒に命をかけているか」「最初にドーン！え！？」) ----------
+// 最初のスライドの HTML をそのまま使い、0.9秒だけ「入り」を一度きり再生する短いカットを前置する:
+//  白いフラッシュ → 画面いっぱいの一言(bang: 例「คุณนั่นแหละ!」)が3倍から叩き込まれて揺れる → 舞台のパンチイン → 猫の目が見開く
+//  → 最後の15%で bang が消え、見出し(刺し文)が着地。続くループ・スライドの t=0 と同じ姿勢で終わるので継ぎ目が見えない
+export const coldOpen = (slide, bang = "", sec = 0.9) => {
+  const big = bang ? `<div id="bang" style="position:absolute;left:40px;right:40px;top:0;bottom:0;display:flex;align-items:center;justify-content:center;text-align:center;z-index:8;pointer-events:none;font-family:'Prompt';font-weight:800;line-height:1.05;font-size:${[...bang].length <= 6 ? 210 : [...bang].length <= 12 ? 150 : 112}px;color:#fff;-webkit-text-stroke:5px #3a0a2a;text-shadow:0 0 30px #ffd54a,0 10px 0 #3a0a2a,0 18px 40px #0008">${bang}</div>` : "";
+  const intro = `<div id="flash" style="position:absolute;inset:0;background:#fff;pointer-events:none;z-index:9"></div>${big}<script>document.addEventListener('DOMContentLoaded',function(){var base=window.__seek;window.__seek=function(t){base((t*${sec}/3)%1);
+    var e=1-Math.pow(1-t,3);var hasBang=!!document.getElementById('bang');
+    var f=document.getElementById('flash'); if(f) f.style.opacity=Math.max(0,0.9-t*5).toFixed(2);
+    var st=document.querySelector('.stage'); if(st) st.style.transform='scale('+(1.3-0.3*e).toFixed(3)+')';
+    var eo=document.getElementById('eyesOpen'); if(eo) eo.setAttribute('transform', (t>0.15&&t<0.8)?'translate(100 92) scale(1.5) translate(-100 -92)':'');
+    var b=document.getElementById('bang'); if(b){ var u=Math.min(1,t/0.22); var sc=3-2*(1-Math.pow(1-u,3)); var sh=(t>0.22&&t<0.5)?Math.sin(t*90)*6:0; var out=t>0.82?Math.min(1,(t-0.82)/0.14):0;
+      b.style.transform='translate('+sh+'px,0) scale('+(sc*(1-0.6*out)).toFixed(3)+') rotate(-6deg)'; b.style.opacity=(u<1?u:(1-out)).toFixed(2); }
+    document.querySelectorAll('h1').forEach(function(el){ if(hasBang){ var v=Math.max(0,(t-0.8)/0.2); el.style.opacity=v.toFixed(2); el.style.transform='scale('+(1.35-0.35*v).toFixed(3)+')'; } else { el.style.transform='scale('+(t<0.55?(1.7-0.7*Math.min(1,t/0.55)):(0.98+0.02*Math.cos((t-0.55)/0.45*Math.PI)))+')'; el.style.opacity=Math.min(1,t/0.25).toFixed(2); } });
+    document.querySelectorAll('.sub,.chip,.act,.tag,.orbs,.big').forEach(function(el){el.style.opacity=Math.min(1,Math.max(0,(t-0.7)/0.3)).toFixed(2);});
   };window.__seek(0);});</script>`;
   const html = slide.html.replace('<div class="brand">', intro + '<div class="brand">');
   return { html, seek: true, animSec: sec, dur: sec, noFadeIn: true, noFadeOut: true };

@@ -494,7 +494,9 @@ if (!process.env.GAME_INTRO) {
     slides.splice(0, 1);
   }
   if (slides[0]) slides[0].noFadeIn = true;   // 1フレーム目=サムネ。黒から始めない
-  if (slides[0] && !process.env.GAME_NO_COLDOPEN) slides.unshift(coldOpen(slides[0]));   // 0.7秒の入り(フラッシュ・パンチイン・文字の着地・目の見開き)
+  // 冒頭の一言(bang): 型ごとに「え!?」を作る挑発・指差し・命令。画面いっぱいに叩き込む
+  const BANG = { find: "หาไม่เจอหรอก!", stop: "แตะ!", zoom: "นี่อะไร!?", quiz: "ตอบผิดแน่!", screenshot: "แคป!", flash: "1 กะพริบ!", lucky: "คุณนั่นแหละ!", choose5: "ซ้าย? ขวา?", target: "ตรงไหม!?", elim: "สีคุณจะรอดไหม!?", face: "อย่ากะพริบ!", breath: "หายใจ…", zoomin: "แม่อยู่ไหน!?", shell: "ตามทันไหม!?", daystop: "วันเกิดคุณ!", wake: "ปลุกแม่!" };
+  if (slides[0] && !process.env.GAME_NO_COLDOPEN) slides.unshift(coldOpen(slides[0], process.env.GAME_BANG ?? (BANG[type] || "")));
 }
 // 締めカードに QR (サイト導線)。TTS は不変なのでキャッシュはそのまま
 if (slides.length) slides[slides.length - 1].html = withQR(slides[slides.length - 1].html);
