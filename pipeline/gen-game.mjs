@@ -10,7 +10,7 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { renderAnimated } from "../../kamishibai/anim.mjs";
-import { loadEnv, cyrb53, bkkIso, thDate, dowOf, DAYS, PALETTES, MOTIFS, STAGE, makePage, targetDate, withQR } from "./lib/scene.mjs";
+import { loadEnv, cyrb53, bkkIso, thDate, dowOf, DAYS, PALETTES, MOTIFS, STAGE, makePage, targetDate, withQR, themeFor, THEMES } from "./lib/scene.mjs";
 
 const ROOT = dirname(fileURLToPath(import.meta.url));
 loadEnv(ROOT);
@@ -22,7 +22,8 @@ const seed = (salt) => cyrb53(iso + "|" + type + "|" + salt);
 const pick = (pool, salt) => pool[seed(salt) % pool.length];
 const rnd = (salt) => (seed(salt) % 10000) / 10000;
 const pal = pick(PALETTES, "pal"), motif = pick(MOTIFS, "motif");
-const page = makePage(pal, motif);
+const theme = process.env.GAME_THEME ? (THEMES.find((t) => t.name === process.env.GAME_THEME) || themeFor(0)) : themeFor(seed("theme"));   // 動画ごとにテーマをランダム(seed)。GAME_THEME=名前 で固定
+const page = makePage(pal, motif, theme);
 const SPEED = { fast: 1.12, warm: 1.0 };
 
 // __seek(t) に自前アニメを合成する(CAT_SCRIPT が body 末尾で __seek を定義するので DOMContentLoaded 後にラップ)
@@ -480,6 +481,20 @@ if (type === "daystop") {
   meta = {};
 }
 
+// ---------- 冒頭0秒からゲームを動かす (2026-09-08 実測: 4本すべて 0:01 離脱 = 静止した表紙/説明カードが原因) ----------
+// 既定で表紙を捨て、「説明の音声」を最初のアニメ・スライドに部品として載せる(音声は同じ文・同じ話速 = キャッシュ維持、0pt)。GAME_INTRO=1 で旧構成
+if (!process.env.GAME_INTRO) {
+  if (slides[0] && slides[0].noFadeIn && !slides[0].tts) slides.shift();   // 表紙(0.45秒静止)を除去
+  const s0 = slides[0], s1 = slides[1];
+  if (s0 && s0.tts && s0.loop && s1 && s1.seek && s1.animSec && !s1.tts) {
+    // 説明スライド(ループ+音声) → ゲーム・スライド(無音アニメ) の組を 1 枚に統合: ゲーム画面を見せながら説明を読む
+    const parts = Array.isArray(s0.tts) ? s0.tts : [{ text: s0.tts, botnoiSpeed: s0.botnoiSpeed }];
+    s1.tts = parts.map((p) => (typeof p === "string" ? { text: p, botnoiSpeed: s0.botnoiSpeed } : { botnoiSpeed: s0.botnoiSpeed, ...p }));
+    s1.minDur = s1.dur; s1.hold = 0.2; delete s1.dur;
+    slides.splice(0, 1);
+  }
+  if (slides[0]) slides[0].noFadeIn = true;   // 1フレーム目=サムネ。黒から始めない
+}
 // 締めカードに QR (サイト導線)。TTS は不変なのでキャッシュはそのまま
 if (slides.length) slides[slides.length - 1].html = withQR(slides[slides.length - 1].html);
 
@@ -489,7 +504,7 @@ const ttsChars = slides.reduce((a, s) => a + (s.tts || "").length, 0);
 const outDir = join(ROOT, "out", `${iso}-${type}${process.env.GAME_SUFFIX || ""}`);
 if (process.env.GAME_DRY) { console.log(`[game:${type}] DRY ${iso} tts chars=${ttsChars} (botnoi ≈ ${ttsChars * 2} pt) slides=${slides.length} meta=${JSON.stringify(meta)}`); process.exit(0); }
 mkdirSync(outDir, { recursive: true });
-console.log(`[game:${type}] ${iso} pal#${PALETTES.indexOf(pal)} motif=${motif} tts=${ttsChars}字 meta=${JSON.stringify(meta)}`);
+console.log(`[game:${type}] ${iso} theme=${theme.name} pal#${PALETTES.indexOf(pal)} motif=${motif} tts=${ttsChars}字 meta=${JSON.stringify(meta)}`);
 const out = await renderAnimated({
   out: join(outDir, `${type}.mp4`), size: [1080, 1920], fps: 30, padSec: 0.3, fade: 0.25,
   ttsEngine, botnoiSpeaker: process.env.BOTNOI_SPEAKER, ttsCache: join(ROOT, ".tts-cache"),

@@ -12,7 +12,7 @@ import { mkdirSync, writeFileSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { renderAnimated } from "../../kamishibai/anim.mjs";
-import { STAGE, makePage, PALETTES as SCENE_PALETTES, MOTIFS, targetDate, withQR } from "./lib/scene.mjs";   // 猫・ページ骨格は gen-short.mjs と共通 (lib/scene.mjs)
+import { STAGE, makePage, PALETTES as SCENE_PALETTES, MOTIFS, targetDate, withQR, themeFor, THEMES as LOOKS } from "./lib/scene.mjs";   // 猫・ページ骨格は gen-short.mjs と共通 (lib/scene.mjs)
 
 const ROOT = dirname(fileURLToPath(import.meta.url));
 
@@ -118,7 +118,8 @@ const hook = pick(HOOKS, "hook"), close = pick(CLOSES, "close"), pal = pick(PALE
 
 // ---------- キャラ(SVG)・アイドル動作・ページ骨格は lib/scene.mjs に共通化 (2026-09-06) ----------
 const motif = pick(MOTIFS, "motif");
-const page = makePage(pal, motif);
+const theme = process.env.PICK3_THEME ? (LOOKS.find((t) => t.name === process.env.PICK3_THEME) || themeFor(0)) : themeFor(cyrb53(iso + "|theme"));   // 動画ごとにテーマをランダム(seed)
+const page = makePage(pal, motif, theme);
 const stage = STAGE;
 
 // ---------- スライド ----------
@@ -144,7 +145,7 @@ const TH_MONTHS = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.�
 const [, cm, cd] = iso.split("-").map(Number);
 const coverHtml = page(460, `${stage}<div class="chip" style="--c:#f4c95d;margin-top:4px">${TD.label} · ${cd} ${TH_MONTHS[cm - 1]}</div><h1 style="font-size:124px;margin-top:18px">เลือก <span class="gold">1 ใน 3</span> 🔮</h1><div class="sub" style="font-size:56px;color:#fff">วันนี้แม่พูดแทนลูกเอง 😼<br>แรงหน่อย แต่รักนะ</div><div class="orbs" style="margin-top:40px"><div class="orb">1</div><div class="orb">2</div><div class="orb">3</div></div>`);
 const coverSlide = { html: coverHtml, dur: 0.45, noFadeIn: true };
-if (!process.env.PICK3_NO_COVER) slides.unshift(coverSlide);
+if (process.env.PICK3_COVER) slides.unshift(coverSlide); else slides[0].noFadeIn = true;   // 2026-09-08: 表紙は既定で無し(0:01離脱対策)。PICK3_COVER=1 で復活
 
 // ---------- 生成 ----------
 // TTS エンジン: $TTS_ENGINE = botnoi | elevenlabs | edge。未指定は anim.mjs の自動判定(ELEVENLABS鍵+声IDがあれば elevenlabs、無ければ edge)
@@ -158,7 +159,7 @@ if (process.env.PICK3_DRY) {   // 生成せず文字数だけ(Botnoi の point �
   process.exit(0);
 }
 mkdirSync(outDir, { recursive: true });
-console.log(`[pick3] ${iso} (${TD.slot}) — テーマ: ${themes.map((t) => t.key).join(" / ")} | hook#${HOOKS.indexOf(hook)} pal#${PALETTES.indexOf(pal)} | tts=${engineEff} ${ttsChars}字`);
+console.log(`[pick3] ${iso} (${TD.slot}) theme=${theme.name} — テーマ: ${themes.map((t) => t.key).join(" / ")} | hook#${HOOKS.indexOf(hook)} pal#${PALETTES.indexOf(pal)} | tts=${engineEff} ${ttsChars}字`);
 const coverOnly = !!process.env.PICK3_COVER_ONLY;   // PICK3_COVER_ONLY=1: 表紙カットだけ cover.mp4 に描画(既存動画へ後付けする用、TTS消費ゼロ)
 const outMp4 = process.env.PICK3_CAPTION_ONLY ? join(outDir, "pick3.mp4") : await renderAnimated({   // PICK3_CAPTION_ONLY=1: 動画は作らず caption/meta だけ更新
   out: join(outDir, coverOnly ? "cover.mp4" : "pick3.mp4"), size: [1080, 1920], fps: 30, padSec: 0.35, fade: 0.25,
