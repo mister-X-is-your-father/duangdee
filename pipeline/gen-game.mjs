@@ -511,7 +511,7 @@ console.log(`[game:${type}] ${iso} theme=${theme.name} pal#${PALETTES.indexOf(pa
 const out = await renderAnimated({
   out: join(outDir, `${type}.mp4`), size: [1080, 1920], fps: 30, padSec: 0.3, fade: 0.25,
   ttsEngine, botnoiSpeaker: process.env.BOTNOI_SPEAKER, ttsCache: join(ROOT, ".tts-cache"),
-  captions: process.env.DD_NO_CAPTIONS ? false : { font: "Prompt", size: 54, marginV: 520 },   // テロップ(無音視聴向け、声と同期。2026-09-08)
+  captions: process.env.DD_NO_CAPTIONS ? false : { font: "Prompt", size: 54, marginV: 300 },   // テロップ(無音視聴向け、声と同期。2026-09-08)
   voice: "th-TH-PremwadeeNeural", rate: "+2%", ttsTempo: 1.0,
   music: join(ROOT, "assets", process.env.GAME_NO_COLDOPEN ? "bgm-warm.mp3" : "bgm-warm-hit.mp3"), musicVol: 0.10,
   slides

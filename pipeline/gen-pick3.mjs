@@ -165,7 +165,7 @@ const outMp4 = process.env.PICK3_CAPTION_ONLY ? join(outDir, "pick3.mp4") : awai
   out: join(outDir, coverOnly ? "cover.mp4" : "pick3.mp4"), size: [1080, 1920], fps: 30, padSec: 0.35, fade: 0.25,
   ttsEngine, botnoiSpeaker: process.env.BOTNOI_SPEAKER,
   ttsCache: join(ROOT, ".tts-cache"),                     // 同じ声×同じ文は再合成しない(再レンダ無料)。gitignore 済み
-  captions: process.env.DD_NO_CAPTIONS ? false : { font: "Prompt", size: 54, marginV: 520 },   // テロップ(無音視聴向け、声と同期。2026-09-08)
+  captions: process.env.DD_NO_CAPTIONS ? false : { font: "Prompt", size: 54, marginV: 300 },   // テロップ(無音視聴向け、声と同期。2026-09-08)
   voice: "th-TH-PremwadeeNeural", rate: "+2%",            // edge-tts 用
   ttsTempo: engineEff === "elevenlabs" ? 1.18 : 1.0,      // ElevenLabs v3 はタイ語がゆっくり(実測 edge比 +20%)→ピッチ不変で1.18倍速。botnoi/edge は素のまま
   music: coverOnly ? undefined : join(ROOT, "assets", process.env.PICK3_NO_COLDOPEN ? "bgm-warm.mp3" : "bgm-warm-hit.mp3"), musicVol: 0.10,
