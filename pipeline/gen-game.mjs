@@ -490,7 +490,7 @@ if (!process.env.GAME_INTRO) {
     // 説明スライド(ループ+音声) → ゲーム・スライド(無音アニメ) の組を 1 枚に統合: ゲーム画面を見せながら説明を読む
     const parts = Array.isArray(s0.tts) ? s0.tts : [{ text: s0.tts, botnoiSpeed: s0.botnoiSpeed }];
     s1.tts = parts.map((p) => (typeof p === "string" ? { text: p, botnoiSpeed: s0.botnoiSpeed } : { botnoiSpeed: s0.botnoiSpeed, ...p }));
-    s1.minDur = s1.dur; s1.hold = 0.2; delete s1.dur;
+    s1.minDur = s1.dur; s1.hold = 0.2; delete s1.dur; s1.noCaps = true;   // 説明文は画面に出ているのでテロップは付けない
     slides.splice(0, 1);
   }
   if (slides[0]) slides[0].noFadeIn = true;   // 1フレーム目=サムネ。黒から始めない
