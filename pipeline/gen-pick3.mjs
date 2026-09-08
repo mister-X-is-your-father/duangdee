@@ -122,9 +122,21 @@ const theme = process.env.PICK3_THEME ? (LOOKS.find((t) => t.name === process.en
 const page = makePage(pal, motif, theme);
 const stage = STAGE;
 
+const TH_MONTHS = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
+const [, cm, cd] = iso.split("-").map(Number);
+
 // ---------- スライド ----------
+// 日付バッジ (2026-09-08 ユーザー「日付をもっと目立たせないと」): 1コマ目=サムネに「ดวงพรุ่งนี้ · พุธ 9 ก.ย.」を金で大きく
+const DOW_TH = ["อาทิตย์", "จันทร์", "อังคาร", "พุธ", "พฤหัส", "ศุกร์", "เสาร์"];
+const dateBadge = `<div class="datebadge"><div class="dl">${TD.label} · วัน${DOW_TH[new Date(iso + "T12:00:00+07:00").getDay()]}</div><div class="dn"><b>${cd}</b><span>${TH_MONTHS[cm - 1]}</span></div></div>`;
+const dateCss = `.datebadge{position:absolute;left:0;right:0;top:64px;z-index:3;text-align:center;font-family:'Mitr'}
+  .datebadge .dl{font-family:'Sarabun';font-size:34px;letter-spacing:5px;color:#e8c876;font-weight:500}
+  .datebadge .dn{display:flex;align-items:baseline;justify-content:center;gap:16px;line-height:1}
+  .datebadge .dn b{font-size:168px;font-weight:600;background:linear-gradient(180deg,#fff1b8,#e0b34d 60%,#b98a2f);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 6px 18px rgba(0,0,0,.55))}
+  .datebadge .dn span{font-size:64px;font-weight:500;color:#fff7ea;text-shadow:0 4px 14px rgba(0,0,0,.6)}
+  .stage{margin-top:300px !important}`;
 const slides = [
-  { html: page(560, `${stage}<h1>${hook.screen}</h1>`), tts: hook.tts, botnoiSpeed: SPEED.sting },   // フックも刺し=速め
+  { html: page(520, `${dateBadge}${stage}<h1>${hook.screen}</h1>`, dateCss), tts: hook.tts, botnoiSpeed: SPEED.sting },   // フックも刺し=速め。日付バッジ付き
   { html: page(520, `${stage}<h1>${CHOOSE.screen}</h1><div class="orbs"><div class="orb" data-pulse data-n="1">1</div><div class="orb" data-pulse data-n="2">2</div><div class="orb" data-pulse data-n="3">3</div></div>`), tts: CHOOSE.tts },
   ...themes.flatMap((th, i) => {
     const L = pick(th.lines, "m" + i);
@@ -141,8 +153,6 @@ const slides = [
 
 // 表紙カット(0.45秒・無音・フェードイン無し) = TikTok/IG の既定サムネ(1フレーム目)。FYPでは自動再生で見えないが、
 // プロフィール一覧・検索・フォロー中タブで効く。引き文句「เลือก 1 ใน 3」+日付+3つの玉+猫、パレットは日替わり
-const TH_MONTHS = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
-const [, cm, cd] = iso.split("-").map(Number);
 const coverHtml = page(460, `${stage}<div class="chip" style="--c:#f4c95d;margin-top:4px">${TD.label} · ${cd} ${TH_MONTHS[cm - 1]}</div><h1 style="font-size:124px;margin-top:18px">เลือก <span class="gold">1 ใน 3</span> 🔮</h1><div class="sub" style="font-size:56px;color:#fff">วันนี้แม่พูดแทนลูกเอง 😼<br>แรงหน่อย แต่รักนะ</div><div class="orbs" style="margin-top:40px"><div class="orb">1</div><div class="orb">2</div><div class="orb">3</div></div>`);
 const coverSlide = { html: coverHtml, dur: 0.45, noFadeIn: true };
 if (process.env.PICK3_COVER) slides.unshift(coverSlide); else { slides[0].noFadeIn = true; if (!process.env.PICK3_NO_COLDOPEN) slides.unshift(coldOpen(slides[0], theme.noble ? "" : (hook.bang || ""), 0.9, !!theme.noble)); }   // 2026-09-08: 表紙なし + 0.7秒のコールドオープン
