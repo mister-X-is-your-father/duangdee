@@ -160,7 +160,8 @@ export const coldOpen = (slide, bang = "", sec = 0.9, soft = false) => {
     var poster=(t<0.02);
     var f=document.getElementById('flash'); if(f) f.style.opacity=poster?'0':Math.max(0,${soft ? 0.45 : 0.9}-(t-0.02)*5).toFixed(2);
     var st=document.querySelector('.stage'); if(st) st.style.transform='scale('+(poster?1:(${soft ? 1.14 : 1.3}-${soft ? 0.14 : 0.3}*e)).toFixed(3)+')';
-    var eo=document.getElementById('eyesOpen'); if(eo) eo.setAttribute('transform', (t>0.15&&t<0.8)?'translate(100 92) scale(1.5) translate(-100 -92)':'');
+    // 目の見開き(scale)は両目が離れて不気味だった(ユーザー指摘 2026-09-08) → 廃止。代わりに入り直後に一度だけ瞬き
+    var eo=document.getElementById('eyesOpen'),ec=document.getElementById('eyesClosed'); if(eo&&ec){ var blink=(t>0.12&&t<0.2); eo.style.display=blink?'none':'block'; ec.style.display=blink?'block':'none'; eo.removeAttribute('transform'); }
     var b=document.getElementById('bang'); if(b){ var u=Math.min(1,(t-0.02)/0.22); var sc=3-2*(1-Math.pow(1-Math.max(0,u),3)); var sh=(t>0.24&&t<0.5)?Math.sin(t*90)*6:0; var out=t>0.82?Math.min(1,(t-0.82)/0.14):0;
       if(poster){ b.style.transform='scale(1) rotate(-6deg)'; b.style.opacity='1'; } else { b.style.transform='translate('+sh+'px,0) scale('+(sc*(1-0.6*out)).toFixed(3)+') rotate(-6deg)'; b.style.opacity=(u<1?Math.max(0,u):(1-out)).toFixed(2); } }
     document.querySelectorAll('h1').forEach(function(el){ if(poster){ el.style.opacity=hasBang?'0':'1'; el.style.transform='scale(1)'; return; } if(hasBang){ var v=Math.max(0,(t-0.8)/0.2); el.style.opacity=v.toFixed(2); el.style.transform='scale('+(1.35-0.35*v).toFixed(3)+')'; } else { el.style.transform='scale('+(t<0.55?(1.7-0.7*Math.min(1,t/0.55)):(0.98+0.02*Math.cos((t-0.55)/0.45*Math.PI)))+')'; el.style.opacity=Math.min(1,t/0.25).toFixed(2); } });
