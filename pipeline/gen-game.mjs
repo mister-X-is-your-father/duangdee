@@ -10,7 +10,7 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { renderAnimated } from "../../kamishibai/anim.mjs";
-import { loadEnv, cyrb53, bkkIso, thDate, dowOf, DAYS, PALETTES, MOTIFS, STAGE, makePage, targetDate } from "./lib/scene.mjs";
+import { loadEnv, cyrb53, bkkIso, thDate, dowOf, DAYS, PALETTES, MOTIFS, STAGE, makePage, targetDate, withQR } from "./lib/scene.mjs";
 
 const ROOT = dirname(fileURLToPath(import.meta.url));
 loadEnv(ROOT);
@@ -479,6 +479,9 @@ if (type === "daystop") {
 #สายมู #สีมงคล #แม่หมอดีดี #วันเกิด #เกมทายใจ`;
   meta = {};
 }
+
+// 締めカードに QR (サイト導線)。TTS は不変なのでキャッシュはそのまま
+if (slides.length) slides[slides.length - 1].html = withQR(slides[slides.length - 1].html);
 
 // ---------- 生成 ----------
 const ttsEngine = process.env.TTS_ENGINE || undefined;

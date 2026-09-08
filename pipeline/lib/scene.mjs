@@ -1,7 +1,8 @@
 // DuangDee 動画の共通部品: 猫キャラ(SVG+アイドル動作)・ページ骨格・パレット・曜日データ・小道具
 // gen-pick3.mjs(3択リビール) / gen-short.mjs(15秒ループ) から import する。
 import { readFileSync } from "node:fs";
-import { join } from "node:path";
+import { join, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
 
 // pipeline/.env.local (TTS鍵等) を process.env に読む。gitignore済み。無ければ何もしない
 export function loadEnv(root) {
@@ -108,6 +109,13 @@ window.__seek=function(t){var TWO=Math.PI*2,br=Math.sin(t*TWO*2),sw=Math.sin(t*T
  document.getElementById('orb').setAttribute('transform','translate(100 168) scale('+(1+0.035*Math.sin(t*TWO*2+1)).toFixed(3)+') translate(-100 -168)');
  document.querySelectorAll('[data-pulse]').forEach(function(el,i){el.style.transform='scale('+(1+0.035*Math.sin(t*TWO*2+i*1.3)).toFixed(3)+')';});
 };window.__seek(0);</script>`;
+// 締めカード用 QR (2026-09-08): コメント/キャプションの URL はリンクにならないので、スクショ→LINE/カメラで読める QR を最後の画面に置く(タイは QR 文化)
+// 猫仕様 (ユーザー指示「おもろい QR」): 丸ドット + 丸角ファインダー + 中央に แม่หมอ の顔 + 枠に猫耳。誤り訂正 H(30%) で中央ロゴ分を吸収
+// 生成: python3 (segno) → assets/qr-cat.svg (URL: https://duangdeedee.me/?s=qr)
+const QR_SVG = (() => { try { return readFileSync(join(dirname(fileURLToPath(import.meta.url)), "..", "assets", "qr-cat.svg"), "utf8"); } catch { return ""; } })();
+const CAT_STATIC = () => CAT_SVG.replace(/ id="/g, ' data-id="').replace('id="orbg"', 'id="orbg2"').replace('url(#orbg)', 'url(#orbg2)');   // id 重複回避(アイドル動作の対象にしない)
+export const QR_BLOCK = QR_SVG ? `<div class="qrbox"><div class="qrframe">${QR_SVG}<div class="qrcat">${CAT_STATIC()}</div></div><div>สแกนไปหาแม่ 🐾</div></div>` : "";
+export const withQR = (html) => QR_BLOCK ? html.replace('<div class="brand">', QR_BLOCK + '<div class="brand">') : html;
 export const FONT = `<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@500;600;700;800&family=Sarabun:wght@500;600&display=block" rel="stylesheet">`;
 export const STAGE = `<div class="stage"><div id="glow"></div>${CAT_SVG}</div>`;
 
@@ -121,6 +129,12 @@ export const makePage = (pal, motif = "none") => (cat, body, extraCss = "") => `
   #glow{position:absolute;inset:-8%;border-radius:50%;background:radial-gradient(circle, rgba(244,201,93,0.30), rgba(244,201,93,0) 62%)}
   #cat{position:relative;width:100%;height:100%;filter:drop-shadow(0 14px 44px rgba(244,201,93,0.35))}
   .brand{position:absolute;bottom:56px;left:0;right:0;font-size:32px;color:#ffffffbb;font-weight:600}
+  .qrbox{position:absolute;right:50px;bottom:126px;text-align:center;font-size:26px;color:#ffffffcc;font-weight:600}
+  .qrframe{position:relative;width:300px;height:300px;margin:0 auto 8px;background:#fff;border-radius:22px;border:5px solid #f4c95d;box-shadow:0 0 40px #f4c95d55}
+  .qrframe::before,.qrframe::after{content:"";position:absolute;top:-30px;width:0;height:0;border-left:22px solid transparent;border-right:22px solid transparent;border-bottom:36px solid #f4c95d}
+  .qrframe::before{left:18px;transform:rotate(-12deg)} .qrframe::after{right:18px;transform:rotate(12deg)}
+  .qrframe>svg{position:absolute;inset:4px;width:calc(100% - 8px);height:calc(100% - 8px)}
+  .qrcat{position:absolute;left:50%;top:50%;width:60px;height:60px;transform:translate(-50%,-52%)} .qrcat svg{width:100%;height:100%;display:block}
   h1{font-size:82px;font-weight:800;line-height:1.28;margin:36px 60px 0;white-space:pre-line}
   .gold{color:#f4c95d}
   .sub{font-family:'Sarabun';font-size:46px;color:#f5f2ffd9;line-height:1.55;margin:28px 90px 0}

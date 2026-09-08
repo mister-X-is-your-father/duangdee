@@ -12,7 +12,7 @@ import { mkdirSync, writeFileSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { renderAnimated } from "../../kamishibai/anim.mjs";
-import { STAGE, makePage, PALETTES as SCENE_PALETTES, MOTIFS, targetDate } from "./lib/scene.mjs";   // 猫・ページ骨格は gen-short.mjs と共通 (lib/scene.mjs)
+import { STAGE, makePage, PALETTES as SCENE_PALETTES, MOTIFS, targetDate, withQR } from "./lib/scene.mjs";   // 猫・ページ骨格は gen-short.mjs と共通 (lib/scene.mjs)
 
 const ROOT = dirname(fileURLToPath(import.meta.url));
 
@@ -135,7 +135,7 @@ const slides = [
       { html: page(420, `${head}<div class="msg">${L.insight}</div><div class="act">🐾 ${L.push}</div>`), tts: [L.insight, L.push], botnoiSpeed: SPEED.warm }   // 部品合成: 例え文と押し文を別キャッシュ
     ];
   }),
-  { html: page(520, `${stage}<h1>${close.screen}</h1><div class="sub">${close.sub} · สีมงคลเฉพาะคุณ →<br><span class="gold">duangdeedee.me</span></div>`), tts: close.tts }
+  { html: withQR(page(520, `${stage}<h1>${close.screen}</h1><div class="sub">${close.sub} · สีมงคลเฉพาะคุณ →<br><span class="gold">duangdeedee.me</span></div>`)), tts: close.tts }
 ].map((s) => ({ ...s, seek: true, loop: 3.0, hold: 0.3 }));
 
 // 表紙カット(0.45秒・無音・フェードイン無し) = TikTok/IG の既定サムネ(1フレーム目)。FYPでは自動再生で見えないが、
