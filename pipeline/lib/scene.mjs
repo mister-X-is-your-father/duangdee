@@ -140,6 +140,22 @@ const QR_SVG = (() => { try { return readFileSync(join(dirname(fileURLToPath(imp
 const CAT_STATIC = () => CAT_SVG.replace(/ id="/g, ' data-id="').replace('id="orbg"', 'id="orbg2"').replace('url(#orbg)', 'url(#orbg2)');   // id 重複回避(アイドル動作の対象にしない)
 export const QR_BLOCK = QR_SVG ? `<div class="qrbox"><div class="qrframe">${QR_SVG}<div class="qrcat">${CAT_STATIC()}</div></div><div>สแกนไปหาแม่ 🐾</div></div>` : "";
 export const withQR = (html) => QR_BLOCK ? html.replace('<div class="brand">', QR_BLOCK + '<div class="brand">') : html;
+// ---------- コールドオープン (2026-09-08 ユーザー「最初の1秒に命をかけているか」) ----------
+// 最初のスライドの HTML をそのまま使い、0.7秒だけ「入り」のアニメを一度きり再生する短いカットを前置する:
+//  白いフラッシュ(2〜4フレーム) → 舞台のパンチイン(1.25→1.0) → 見出しが拡大から弾んで着地(overshoot) → 猫の目が見開く。
+//  続くループ・スライドの t=0 と同じ姿勢で終わるので継ぎ目が見えない。音声は次スライドから(0.7秒は効果音+BGM)
+export const coldOpen = (slide, sec = 0.7) => {
+  const intro = `<div id="flash" style="position:absolute;inset:0;background:#fff;pointer-events:none;z-index:9"></div><script>document.addEventListener('DOMContentLoaded',function(){var base=window.__seek;window.__seek=function(t){base((t*${sec}/3)%1);
+    var e=1-Math.pow(1-t,3);var back=1+2.2*Math.pow(1-t,2)*Math.sin(t*Math.PI*2.2);
+    document.querySelectorAll('h1').forEach(function(el){el.style.transform='scale('+(t<0.55?(1.7-0.7*Math.min(1,t/0.55)*1.0):(0.98+0.02*Math.cos((t-0.55)/0.45*Math.PI)))+')';el.style.opacity=Math.min(1,t/0.25).toFixed(2);});
+    var st=document.querySelector('.stage'); if(st) st.style.transform='scale('+(1.28-0.28*e).toFixed(3)+')';
+    var f=document.getElementById('flash'); if(f) f.style.opacity=Math.max(0,0.85-t*4).toFixed(2);
+    var eo=document.getElementById('eyesOpen'); if(eo) eo.setAttribute('transform', (t>0.2&&t<0.75)?'translate(100 92) scale(1.45) translate(-100 -92)':'');
+    document.querySelectorAll('.sub,.chip,.act,.tag,.orbs,.big').forEach(function(el){el.style.opacity=Math.min(1,Math.max(0,(t-0.35)/0.4)).toFixed(2);});
+  };window.__seek(0);});</script>`;
+  const html = slide.html.replace('<div class="brand">', intro + '<div class="brand">');
+  return { html, seek: true, animSec: sec, dur: sec, noFadeIn: true, noFadeOut: true };
+};
 export const FONT = `<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@500;600;700;800&family=Sarabun:wght@500;600&display=block" rel="stylesheet">`;
 export const STAGE = `<div class="stage"><div id="glow"></div>${CAT_SVG}</div>`;
 

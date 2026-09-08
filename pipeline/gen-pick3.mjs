@@ -12,7 +12,7 @@ import { mkdirSync, writeFileSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { renderAnimated } from "../../kamishibai/anim.mjs";
-import { STAGE, makePage, PALETTES as SCENE_PALETTES, MOTIFS, targetDate, withQR, themeFor, THEMES as LOOKS } from "./lib/scene.mjs";   // 猫・ページ骨格は gen-short.mjs と共通 (lib/scene.mjs)
+import { STAGE, makePage, PALETTES as SCENE_PALETTES, MOTIFS, targetDate, withQR, themeFor, THEMES as LOOKS, coldOpen } from "./lib/scene.mjs";   // 猫・ページ骨格は gen-short.mjs と共通 (lib/scene.mjs)
 
 const ROOT = dirname(fileURLToPath(import.meta.url));
 
@@ -145,7 +145,7 @@ const TH_MONTHS = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.�
 const [, cm, cd] = iso.split("-").map(Number);
 const coverHtml = page(460, `${stage}<div class="chip" style="--c:#f4c95d;margin-top:4px">${TD.label} · ${cd} ${TH_MONTHS[cm - 1]}</div><h1 style="font-size:124px;margin-top:18px">เลือก <span class="gold">1 ใน 3</span> 🔮</h1><div class="sub" style="font-size:56px;color:#fff">วันนี้แม่พูดแทนลูกเอง 😼<br>แรงหน่อย แต่รักนะ</div><div class="orbs" style="margin-top:40px"><div class="orb">1</div><div class="orb">2</div><div class="orb">3</div></div>`);
 const coverSlide = { html: coverHtml, dur: 0.45, noFadeIn: true };
-if (process.env.PICK3_COVER) slides.unshift(coverSlide); else slides[0].noFadeIn = true;   // 2026-09-08: 表紙は既定で無し(0:01離脱対策)。PICK3_COVER=1 で復活
+if (process.env.PICK3_COVER) slides.unshift(coverSlide); else { slides[0].noFadeIn = true; if (!process.env.PICK3_NO_COLDOPEN) slides.unshift(coldOpen(slides[0])); }   // 2026-09-08: 表紙なし + 0.7秒のコールドオープン
 
 // ---------- 生成 ----------
 // TTS エンジン: $TTS_ENGINE = botnoi | elevenlabs | edge。未指定は anim.mjs の自動判定(ELEVENLABS鍵+声IDがあれば elevenlabs、無ければ edge)
@@ -167,7 +167,7 @@ const outMp4 = process.env.PICK3_CAPTION_ONLY ? join(outDir, "pick3.mp4") : awai
   ttsCache: join(ROOT, ".tts-cache"),                     // 同じ声×同じ文は再合成しない(再レンダ無料)。gitignore 済み
   voice: "th-TH-PremwadeeNeural", rate: "+2%",            // edge-tts 用
   ttsTempo: engineEff === "elevenlabs" ? 1.18 : 1.0,      // ElevenLabs v3 はタイ語がゆっくり(実測 edge比 +20%)→ピッチ不変で1.18倍速。botnoi/edge は素のまま
-  music: coverOnly ? undefined : join(ROOT, "assets", "bgm-warm.mp3"), musicVol: 0.10,
+  music: coverOnly ? undefined : join(ROOT, "assets", process.env.PICK3_NO_COLDOPEN ? "bgm-warm.mp3" : "bgm-warm-hit.mp3"), musicVol: 0.10,
   slides: coverOnly ? [coverSlide] : slides
 }, ROOT);
 

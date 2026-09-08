@@ -10,7 +10,7 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { renderAnimated } from "../../kamishibai/anim.mjs";
-import { loadEnv, cyrb53, bkkIso, thDate, dowOf, DAYS, PALETTES, MOTIFS, STAGE, makePage, targetDate, withQR, themeFor, THEMES } from "./lib/scene.mjs";
+import { loadEnv, cyrb53, bkkIso, thDate, dowOf, DAYS, PALETTES, MOTIFS, STAGE, makePage, targetDate, withQR, themeFor, THEMES, coldOpen } from "./lib/scene.mjs";
 
 const ROOT = dirname(fileURLToPath(import.meta.url));
 loadEnv(ROOT);
@@ -494,6 +494,7 @@ if (!process.env.GAME_INTRO) {
     slides.splice(0, 1);
   }
   if (slides[0]) slides[0].noFadeIn = true;   // 1フレーム目=サムネ。黒から始めない
+  if (slides[0] && !process.env.GAME_NO_COLDOPEN) slides.unshift(coldOpen(slides[0]));   // 0.7秒の入り(フラッシュ・パンチイン・文字の着地・目の見開き)
 }
 // 締めカードに QR (サイト導線)。TTS は不変なのでキャッシュはそのまま
 if (slides.length) slides[slides.length - 1].html = withQR(slides[slides.length - 1].html);
@@ -509,7 +510,7 @@ const out = await renderAnimated({
   out: join(outDir, `${type}.mp4`), size: [1080, 1920], fps: 30, padSec: 0.3, fade: 0.25,
   ttsEngine, botnoiSpeaker: process.env.BOTNOI_SPEAKER, ttsCache: join(ROOT, ".tts-cache"),
   voice: "th-TH-PremwadeeNeural", rate: "+2%", ttsTempo: 1.0,
-  music: join(ROOT, "assets", "bgm-warm.mp3"), musicVol: 0.10,
+  music: join(ROOT, "assets", process.env.GAME_NO_COLDOPEN ? "bgm-warm.mp3" : "bgm-warm-hit.mp3"), musicVol: 0.10,
   slides
 }, ROOT);
 writeFileSync(join(outDir, "caption.txt"), caption);
